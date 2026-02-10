@@ -1,6 +1,7 @@
 import './ServiceCard.css';
+import UptimeBar from './UptimeBar';
 
-export default function ServiceCard({ service }) {
+export default function ServiceCard({ service, history }) {
   const statusColor = {
     up: '#4ade80',
     down: '#f87171',
@@ -69,6 +70,7 @@ export default function ServiceCard({ service }) {
           ))}
         </div>
       )}
+      <UptimeBar history={history} />
     </div>
   );
 }

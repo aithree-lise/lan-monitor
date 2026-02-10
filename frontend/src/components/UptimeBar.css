@@ -1,0 +1,53 @@
+.uptime-bar-container {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.uptime-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.uptime-label {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.uptime-percent {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.uptime-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background-color: #1f2937;
+  gap: 1px;
+}
+
+.uptime-segment {
+  min-width: 1px;
+  border-radius: 1px;
+  transition: opacity 0.15s;
+}
+
+.uptime-segment:hover {
+  opacity: 0.8;
+}
+
+.uptime-empty {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: #6b7280;
+  height: 6px;
+}

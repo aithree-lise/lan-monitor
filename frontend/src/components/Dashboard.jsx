@@ -8,6 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 export default function Dashboard() {
   const [services, setServices] = useState([]);
   const [gpus, setGpus] = useState([]);
+  const [histories, setHistories] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
@@ -28,6 +29,23 @@ export default function Dashboard() {
         const gpuData = await gpuRes.json();
         setGpus(gpuData.gpus || []);
       }
+
+      // Fetch uptime history for each service
+      const historyMap = {};
+      await Promise.all(
+        (servicesData.services || []).map(async (svc) => {
+          try {
+            const res = await fetch(`${API_URL}/api/services/${svc.id}/history?hours=24`);
+            if (res.ok) {
+              const data = await res.json();
+              historyMap[svc.id] = data.history || data || [];
+            }
+          } catch {
+            // History endpoint may not exist yet — ignore
+          }
+        })
+      );
+      setHistories(historyMap);
       
       setLastUpdate(new Date());
       setError(null);
@@ -89,7 +107,7 @@ export default function Dashboard() {
         <h2 className="section-title">🔧 Services</h2>
         <div className="services-grid">
           {services.map(service => (
-            <ServiceCard key={service.id} service={service} />
+            <ServiceCard key={service.id} service={service} history={histories[service.id]} />
           ))}
         </div>
       </section>
