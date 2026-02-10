@@ -171,23 +171,32 @@ export async function checkAllServices() {
 export async function checkGPU() {
   try {
     const { stdout } = await execAsync(
-      'nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,memory.used,memory.total --format=csv,noheader,nounits'
+      'nvidia-smi --query-gpu=name,utilization.gpu,utilization.memory,temperature.gpu,memory.used,memory.total,power.draw --format=csv,noheader,nounits'
     );
     
-    // Parse CSV output: gpu_util, temp, mem_used, mem_total
+    // Parse CSV output: name, gpu_util, mem_util, temp, mem_used, mem_total, power
+    // Note: DGX Spark (GB10/Blackwell) uses unified memory — memory.used/total return [N/A]
     const lines = stdout.trim().split('\n');
     const gpus = lines.map((line, index) => {
-      const [gpuUtil, temp, memUsed, memTotal] = line.split(',').map(s => parseFloat(s.trim()));
+      const parts = line.split(',').map(s => s.trim());
+      const name = parts[0];
+      const gpuUtil = parseFloat(parts[1]);
+      const memUtil = parseFloat(parts[2]);
+      const temp = parseFloat(parts[3]);
+      const memUsed = parts[4] === '[N/A]' ? null : parseFloat(parts[4]);
+      const memTotal = parts[5] === '[N/A]' ? null : parseFloat(parts[5]);
+      const power = parts[6] === '[N/A]' ? null : parseFloat(parts[6]);
       
       return {
         id: index,
-        name: `GPU ${index}`,
-        utilization: gpuUtil,
-        temperature: temp,
+        name: name || `GPU ${index}`,
+        utilization: isNaN(gpuUtil) ? null : gpuUtil,
+        memoryUtilization: isNaN(memUtil) ? null : memUtil,
+        temperature: isNaN(temp) ? null : temp,
         memoryUsed: memUsed,
         memoryTotal: memTotal,
-        memoryUtilization: ((memUsed / memTotal) * 100).toFixed(1),
-        status: temp < 85 ? 'up' : 'warning', // Warning if temp > 85°C
+        powerDraw: power,
+        status: temp != null && temp < 85 ? 'up' : temp != null ? 'warning' : 'up',
         lastChecked: new Date().toISOString()
       };
     });
