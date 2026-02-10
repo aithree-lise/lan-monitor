@@ -16,8 +16,9 @@ const SERVICES = [
     id: 'ollama',
     name: 'Ollama',
     host: '192.168.27.30:11434',
-    type: 'http',
-    url: 'http://192.168.27.30:11434/api/tags'
+    type: 'ollama',
+    url: 'http://192.168.27.30:11434/api/tags',
+    psUrl: 'http://192.168.27.30:11434/api/ps'
   },
   {
     id: 'mac-aithree',
@@ -81,6 +82,63 @@ async function checkPing(host, timeout = 2) {
   }
 }
 
+async function checkOllama(service, timeout = 5000) {
+  const start = Date.now();
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    // Check health
+    const healthResponse = await fetch(service.url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'lan-monitor/1.0' }
+    });
+    
+    clearTimeout(timeoutId);
+    const responseMs = Date.now() - start;
+    
+    if (!healthResponse.ok) {
+      return {
+        status: 'down',
+        responseMs,
+        statusCode: healthResponse.status
+      };
+    }
+    
+    // Fetch running models
+    let models = [];
+    try {
+      const psResponse = await fetch(service.psUrl, {
+        headers: { 'User-Agent': 'lan-monitor/1.0' }
+      });
+      
+      if (psResponse.ok) {
+        const psData = await psResponse.json();
+        models = (psData.models || []).map(m => ({
+          name: m.name,
+          size: m.size,
+          sizeGB: (m.size / (1024 * 1024 * 1024)).toFixed(2)
+        }));
+      }
+    } catch (err) {
+      // Ignore model fetch errors
+    }
+    
+    return {
+      status: 'up',
+      responseMs,
+      statusCode: healthResponse.status,
+      models
+    };
+  } catch (error) {
+    return {
+      status: 'down',
+      responseMs: Date.now() - start,
+      error: error.message
+    };
+  }
+}
+
 export async function checkService(service) {
   const result = {
     id: service.id,
@@ -94,6 +152,9 @@ export async function checkService(service) {
     return { ...result, ...check };
   } else if (service.type === 'ping') {
     const check = await checkPing(service.host);
+    return { ...result, ...check };
+  } else if (service.type === 'ollama') {
+    const check = await checkOllama(service);
     return { ...result, ...check };
   }
   

@@ -55,6 +55,20 @@ export default function ServiceCard({ service }) {
           {service.error}
         </div>
       )}
+      
+      {service.models && service.models.length > 0 && (
+        <div className="service-models">
+          <div className="models-header">
+            <span className="models-label">🤖 Loaded Models ({service.models.length})</span>
+          </div>
+          {service.models.map((model, idx) => (
+            <div key={idx} className="model-item">
+              <span className="model-name">{model.name}</span>
+              <span className="model-size">{model.sizeGB} GB</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
