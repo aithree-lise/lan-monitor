@@ -107,4 +107,38 @@ export async function checkAllServices() {
   return results;
 }
 
+export async function checkGPU() {
+  try {
+    const { stdout } = await execAsync(
+      'nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,memory.used,memory.total --format=csv,noheader,nounits'
+    );
+    
+    // Parse CSV output: gpu_util, temp, mem_used, mem_total
+    const lines = stdout.trim().split('\n');
+    const gpus = lines.map((line, index) => {
+      const [gpuUtil, temp, memUsed, memTotal] = line.split(',').map(s => parseFloat(s.trim()));
+      
+      return {
+        id: index,
+        name: `GPU ${index}`,
+        utilization: gpuUtil,
+        temperature: temp,
+        memoryUsed: memUsed,
+        memoryTotal: memTotal,
+        memoryUtilization: ((memUsed / memTotal) * 100).toFixed(1),
+        status: temp < 85 ? 'up' : 'warning', // Warning if temp > 85°C
+        lastChecked: new Date().toISOString()
+      };
+    });
+    
+    return { gpus, status: 'ok' };
+  } catch (error) {
+    return {
+      gpus: [],
+      status: 'error',
+      error: error.message
+    };
+  }
+}
+
 export { SERVICES };

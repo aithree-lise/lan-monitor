@@ -1,22 +1,34 @@
 import { useState, useEffect } from 'react';
 import ServiceCard from './ServiceCard';
+import GpuCard from './GpuCard';
 import './Dashboard.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function Dashboard() {
   const [services, setServices] = useState([]);
+  const [gpus, setGpus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
 
-  const fetchServices = async () => {
+  const fetchData = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/services`);
-      if (!response.ok) throw new Error('Failed to fetch services');
+      const [servicesRes, gpuRes] = await Promise.all([
+        fetch(`${API_URL}/api/services`),
+        fetch(`${API_URL}/api/gpu`)
+      ]);
       
-      const data = await response.json();
-      setServices(data.services);
+      if (!servicesRes.ok) throw new Error('Failed to fetch services');
+      
+      const servicesData = await servicesRes.json();
+      setServices(servicesData.services);
+      
+      if (gpuRes.ok) {
+        const gpuData = await gpuRes.json();
+        setGpus(gpuData.gpus || []);
+      }
+      
       setLastUpdate(new Date());
       setError(null);
     } catch (err) {
@@ -27,10 +39,10 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchServices();
+    fetchData();
     
     // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchServices, 30000);
+    const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -62,15 +74,29 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="services-grid">
-        {services.map(service => (
-          <ServiceCard key={service.id} service={service} />
-        ))}
-      </div>
+      {gpus.length > 0 && (
+        <section className="gpu-section">
+          <h2 className="section-title">🎮 GPU Status (DGX Spark)</h2>
+          <div className="gpu-grid">
+            {gpus.map(gpu => (
+              <GpuCard key={gpu.id} gpu={gpu} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="services-section">
+        <h2 className="section-title">🔧 Services</h2>
+        <div className="services-grid">
+          {services.map(service => (
+            <ServiceCard key={service.id} service={service} />
+          ))}
+        </div>
+      </section>
 
       <footer className="dashboard-footer">
         <span>Last update: {lastUpdate?.toLocaleTimeString()}</span>
-        <button onClick={fetchServices} className="refresh-button">
+        <button onClick={fetchData} className="refresh-button">
           🔄 Refresh
         </button>
       </footer>

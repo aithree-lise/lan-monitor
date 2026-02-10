@@ -4,11 +4,13 @@ services:
   lan-monitor:
     build: .
     container_name: lan-monitor
+    runtime: nvidia
     ports:
       - "8080:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - NVIDIA_VISIBLE_DEVICES=all
     restart: unless-stopped
     networks:
       - lise-network

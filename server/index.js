@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { checkAllServices, checkService, SERVICES } from './checks.js';
+import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +17,8 @@ app.use(express.json());
 // Cache for service checks (max 30s old)
 let cachedResults = null;
 let lastCheck = 0;
+let cachedGPU = null;
+let lastGPUCheck = 0;
 const CACHE_TTL = 30000; // 30 seconds
 
 // API Routes
@@ -55,6 +57,26 @@ app.get('/api/services/:id', async (req, res) => {
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/gpu', async (req, res) => {
+  try {
+    const now = Date.now();
+    
+    // Return cached if fresh
+    if (cachedGPU && (now - lastGPUCheck) < CACHE_TTL) {
+      return res.json({ ...cachedGPU, cached: true });
+    }
+    
+    // Check GPU status
+    const result = await checkGPU();
+    cachedGPU = result;
+    lastGPUCheck = now;
+    
+    res.json({ ...result, cached: false });
+  } catch (error) {
+    res.status(500).json({ error: error.message, gpus: [], status: 'error' });
   }
 });
 
