@@ -65,8 +65,8 @@ async function checkHTTP(url, timeout = 5000) {
 async function checkPing(host, timeout = 2) {
   const start = Date.now();
   try {
-    // macOS ping: -c count, -W timeout in ms (multiply by 1000)
-    await execAsync(`ping -c 1 -W ${timeout * 1000} ${host}`);
+    // Linux ping: -c count, -W timeout in seconds
+    await execAsync(`ping -c 1 -W ${timeout} ${host}`);
     const responseMs = Date.now() - start;
     
     return {

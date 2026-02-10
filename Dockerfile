@@ -11,8 +11,14 @@ RUN cd frontend && npm install
 COPY frontend ./frontend
 RUN cd frontend && npm run build
 
-# Production stage
-FROM node:22-alpine
+# Production stage — nvidia/cuda base so nvidia-smi is available at runtime
+FROM nvidia/cuda:12.8.0-base-ubuntu22.04
+
+# Install Node.js 22
+RUN apt-get update && apt-get install -y curl iputils-ping && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
