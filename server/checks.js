@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { logServiceCheck } from './history.js';
 
 const execAsync = promisify(exec);
 
@@ -147,18 +148,24 @@ export async function checkService(service) {
     lastChecked: new Date().toISOString()
   };
   
+  let check;
+  
   if (service.type === 'http') {
-    const check = await checkHTTP(service.url);
-    return { ...result, ...check };
+    check = await checkHTTP(service.url);
   } else if (service.type === 'ping') {
-    const check = await checkPing(service.host);
-    return { ...result, ...check };
+    check = await checkPing(service.host);
   } else if (service.type === 'ollama') {
-    const check = await checkOllama(service);
-    return { ...result, ...check };
+    check = await checkOllama(service);
+  } else {
+    return { ...result, status: 'unknown' };
   }
   
-  return { ...result, status: 'unknown' };
+  const finalResult = { ...result, ...check };
+  
+  // Log the check result to history
+  logServiceCheck(service.id, finalResult.status, finalResult.responseMs);
+  
+  return finalResult;
 }
 
 export async function checkAllServices() {
