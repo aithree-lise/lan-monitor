@@ -1,0 +1,33 @@
+.system-info {
+  margin-bottom: 2rem;
+}
+
+.system-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.system-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid #e9ecef;
+}
+
+.system-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.system-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #212529;
+}
