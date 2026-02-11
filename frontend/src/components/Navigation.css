@@ -1,9 +1,10 @@
 /* Navigation Bar */
 .navigation {
-  background: linear-gradient(135deg, #0f1633 0%, #1a2347 100%);
-  border-bottom: 2px solid #2a3a6f;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border-bottom: 2px solid var(--border);
   padding: 1.5rem 0;
-  sticky: top;
+  position: sticky;
+  top: 0;
   z-index: 100;
 }
 
@@ -18,11 +19,27 @@
 }
 
 .nav-title {
-  color: #e0e0ff;
+  color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
   white-space: nowrap;
+}
+
+.theme-toggle {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+}
+
+.theme-toggle:hover {
+  background: var(--accent);
+  color: white;
 }
 
 .nav-tabs {
