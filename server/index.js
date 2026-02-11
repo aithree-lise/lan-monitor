@@ -15,6 +15,15 @@ import {
   updateAgentStatus,
   validateTicketData
 } from './tickets.js';
+import {
+  getAllIdeas,
+  getIdeaById,
+  createIdea,
+  updateIdea,
+  deleteIdea,
+  convertIdeaToTicket,
+  validateIdeaData
+} from './ideas.js';
 import { startAgentReporter, manualAgentCheck } from './agent-reporter.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -236,6 +245,111 @@ app.get('/api/agents/check', async (req, res) => {
   try {
     const results = await manualAgentCheck();
     res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// AP6.2: Ideas API
+// ============================================
+
+// GET all ideas (with filters & sorting)
+app.get('/api/ideas', (req, res) => {
+  try {
+    const filters = {};
+    if (req.query.status) filters.status = req.query.status;
+    if (req.query.tag) filters.tag = req.query.tag;
+    if (req.query.sort) filters.sort = req.query.sort;
+    if (req.query.order) filters.order = req.query.order;
+    
+    const ideas = getAllIdeas(filters);
+    res.json({ ideas, count: ideas.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET single idea
+app.get('/api/ideas/:id', (req, res) => {
+  try {
+    const idea = getIdeaById(parseInt(req.params.id));
+    
+    if (!idea) {
+      res.status(404);
+      return res.json({ error: 'Idea not found', id: req.params.id });
+    }
+    
+    res.json(idea);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST create new idea
+app.post('/api/ideas', (req, res) => {
+  try {
+    // Validate
+    const errors = validateIdeaData(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({ error: errors.join(', ') });
+    }
+    
+    const idea = createIdea(req.body);
+    res.status(201).json(idea);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT update idea
+app.put('/api/ideas/:id', (req, res) => {
+  try {
+    const idea = getIdeaById(parseInt(req.params.id));
+    
+    if (!idea) {
+      return res.status(404).json({ error: 'Idea not found' });
+    }
+    
+    // Validate if provided
+    const errors = validateIdeaData(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({ error: errors.join(', ') });
+    }
+    
+    const updated = updateIdea(parseInt(req.params.id), req.body);
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE idea
+app.delete('/api/ideas/:id', (req, res) => {
+  try {
+    const success = deleteIdea(parseInt(req.params.id));
+    
+    if (!success) {
+      return res.status(404).json({ error: 'Idea not found' });
+    }
+    
+    res.json({ success: true, id: req.params.id });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST convert idea to ticket
+app.post('/api/ideas/:id/convert', (req, res) => {
+  try {
+    const result = convertIdeaToTicket(parseInt(req.params.id));
+    
+    if (result.error) {
+      const status = result.status || 500;
+      return res.status(status).json({ error: result.error });
+    }
+    
+    res.json(result.ticket);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
