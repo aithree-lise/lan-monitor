@@ -144,32 +144,20 @@ app.get('/api/gpu', async (req, res) => {
 // ============================================
 // TASK-015: System Info Panel
 // ============================================
-app.get('/api/system', (req, res) => {
+app.get('/api/system', async (req, res) => {
   try {
-    const { execSync } = require('child_process');
+    const { execSync } = await import("child_process");
     
-    const uptimeSeconds = os.uptime();
-    const uptimeStr = `${Math.floor(uptimeSeconds/3600)}h ${Math.floor((uptimeSeconds%3600)/60)}m`;
-    
+    const uptime = os.uptime();
     const totalMem = os.totalmem();
     const freeMem = os.freemem();
-    const usedMem = totalMem - freeMem;
-    const memStr = `${(usedMem/1e9).toFixed(1)}G/${(totalMem/1e9).toFixed(1)}G`;
-    
-    const loadAvg = os.loadavg();
-    const loadStr = loadAvg.map(l => l.toFixed(2)).join(', ');
-    
+    const load = os.loadavg();
     let disk = 'unknown';
-    try {
-      disk = execSync('df -h / --output=used,size,pcent | tail -1').toString().trim();
-    } catch(e) {
-      // Fallback if command fails
-    }
-    
+    try { disk = execSync('df -h / --output=used,size,pcent | tail -1').toString().trim(); } catch(e) {}
     res.json({
-      uptime: uptimeStr,
-      memory: memStr,
-      loadAvg: loadStr,
+      uptime: Math.floor(uptime/3600) + 'h ' + Math.floor((uptime%3600)/60) + 'm',
+      memory: ((totalMem-freeMem)/1e9).toFixed(1) + 'G/' + (totalMem/1e9).toFixed(1) + 'G',
+      loadAvg: load.map(l => l.toFixed(2)).join(', '),
       disk,
       timestamp: new Date().toISOString()
     });
