@@ -1,0 +1,191 @@
+/* Agent Status Component */
+.agent-status {
+  background: #0f1633;
+  border: 1px solid #1e2a5f;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.agent-status.loading,
+.agent-status.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 80px;
+}
+
+.agent-spinner {
+  animation: spin 2s linear infinite;
+  font-size: 1.5rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.agent-status-title {
+  color: #b0b0ff;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.agent-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.agent-card {
+  background: #0a0e27;
+  border: 1px solid #1e2a5f;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.agent-card:hover {
+  border-color: #2a3a6f;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-2px);
+}
+
+.agent-card.status-online {
+  border-left: 4px solid #90ee90;
+}
+
+.agent-card.status-idle {
+  border-left: 4px solid #ffeb3b;
+}
+
+.agent-card.status-offline {
+  border-left: 4px solid #ff6b6b;
+}
+
+.agent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.agent-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  flex: 1;
+}
+
+.agent-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-top: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(144, 238, 144, 0.4);
+}
+
+.agent-names {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.agent-name {
+  color: #e0e0ff;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.agent-status-text {
+  color: #7a7aff;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.agent-workload {
+  background: rgba(102, 126, 234, 0.2);
+  color: #667eea;
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.agent-task {
+  background: #0f1633;
+  border: 1px solid #1e2a5f;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.task-icon {
+  font-size: 1rem;
+}
+
+.task-text {
+  color: #a0a0ff;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.agent-meta {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #1e2a5f;
+}
+
+.update-time {
+  color: #666a99;
+  font-size: 0.85rem;
+}
+
+.no-agents {
+  color: #666a99;
+  text-align: center;
+  padding: 2rem 1rem;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.agent-error-icon {
+  font-size: 1.5rem;
+}
+
+.agent-error-text {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .agent-list {
+    grid-template-columns: 1fr;
+  }
+
+  .agent-card {
+    padding: 0.9rem;
+  }
+
+  .agent-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .agent-workload {
+    align-self: flex-start;
+  }
+}

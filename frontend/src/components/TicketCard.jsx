@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const COLUMNS = {
@@ -9,7 +11,24 @@ const COLUMNS = {
 
 const COLUMN_ORDER = ['backlog', 'in-progress', 'review', 'done'];
 
-export default function TicketCard({ ticket, onMove, onDelete }) {
+const AGENT_OPTIONS = [
+  { value: 'siegbert', label: 'Siegbert 🎩' },
+  { value: 'eugene', label: 'Eugene' },
+  { value: 'bubblebass', label: 'Bubble Bass 🥒' },
+  { value: 'byte', label: 'Sandy Cheeks 🔍' }
+];
+
+const PRIORITY_CONFIG = {
+  low: { color: '#999', bgColor: 'rgba(153, 153, 153, 0.2)' },
+  medium: { color: '#ffeb3b', bgColor: 'rgba(255, 235, 59, 0.2)' },
+  high: { color: '#ff9800', bgColor: 'rgba(255, 152, 0, 0.2)' },
+  critical: { color: '#ff6b6b', bgColor: 'rgba(255, 107, 107, 0.2)' }
+};
+
+export default function TicketCard({ ticket, onMove, onDelete, onUpdate }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedAssignee, setEditedAssignee] = useState(ticket.assigned_to || '');
+
   const currentIndex = COLUMN_ORDER.indexOf(ticket.status);
   
   const canMovePrev = currentIndex > 0;
@@ -36,6 +55,27 @@ export default function TicketCard({ ticket, onMove, onDelete }) {
     }
   };
 
+  const handleAssigneeChange = async (e) => {
+    const newAssignee = e.target.value;
+    setEditedAssignee(newAssignee);
+
+    try {
+      const res = await fetch(`${API_URL}/api/tickets/${ticket.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assigned_to: newAssignee || null })
+      });
+
+      if (!res.ok) throw new Error('Failed to update assignee');
+      
+      const updated = await res.json();
+      onUpdate?.(updated.ticket || updated);
+    } catch (err) {
+      console.error('Error updating assignee:', err);
+      alert('Failed to update assignee: ' + err.message);
+    }
+  };
+
   const handleDelete = async () => {
     if (!confirm(`Delete ticket "${ticket.title}"?`)) return;
 
@@ -52,18 +92,22 @@ export default function TicketCard({ ticket, onMove, onDelete }) {
     }
   };
 
-  const priorityClass = `priority-${ticket.priority || 'medium'}`;
+  const priorityColor = PRIORITY_CONFIG[ticket.priority || 'medium'].color;
+  const priorityBg = PRIORITY_CONFIG[ticket.priority || 'medium'].bgColor;
   const createdDate = new Date(ticket.created_at).toLocaleDateString('de-DE', {
     month: 'short',
     day: 'numeric'
   });
 
   return (
-    <div className={`ticket-card ${priorityClass}`}>
+    <div className="ticket-card" style={{ borderLeftColor: priorityColor }}>
       <div className="ticket-header">
         <div className="ticket-id-priority">
           <span className="ticket-id">#{ticket.id}</span>
-          <span className={`priority-badge ${ticket.priority || 'medium'}`}>
+          <span 
+            className="priority-badge"
+            style={{ color: priorityColor, backgroundColor: priorityBg }}
+          >
             {ticket.priority ? ticket.priority.toUpperCase() : 'MEDIUM'}
           </span>
         </div>
@@ -78,11 +122,24 @@ export default function TicketCard({ ticket, onMove, onDelete }) {
         <p className="ticket-description">{ticket.description}</p>
       )}
 
-      {ticket.assigned_to && (
-        <div className="ticket-assignee">
-          👤 {ticket.assigned_to}
-        </div>
-      )}
+      <div className="ticket-assignee-section">
+        <label htmlFor={`assignee-${ticket.id}`} className="assignee-label">
+          👤 Assigned to:
+        </label>
+        <select
+          id={`assignee-${ticket.id}`}
+          className="assignee-select"
+          value={editedAssignee}
+          onChange={handleAssigneeChange}
+        >
+          <option value="">Unassigned</option>
+          {AGENT_OPTIONS.map(agent => (
+            <option key={agent.value} value={agent.value}>
+              {agent.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="ticket-meta">
         <span className="ticket-date">📅 {createdDate}</span>

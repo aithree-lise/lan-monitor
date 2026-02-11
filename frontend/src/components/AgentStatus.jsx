@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './AgentStatus.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -30,6 +31,27 @@ export default function AgentStatus() {
     return () => clearInterval(interval);
   }, []);
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'online': return '#90ee90';
+      case 'idle': return '#ffeb3b';
+      case 'offline': return '#ff6b6b';
+      default: return '#999';
+    }
+  };
+
+  const formatLastUpdate = (timestamp) => {
+    if (!timestamp) return 'never';
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffSecs = Math.floor(diffMs / 1000);
+    
+    if (diffSecs < 60) return 'just now';
+    if (diffSecs < 3600) return `${Math.floor(diffSecs / 60)}m ago`;
+    return `${Math.floor(diffSecs / 3600)}h ago`;
+  };
+
   if (loading) {
     return (
       <div className="agent-status loading">
@@ -55,11 +77,34 @@ export default function AgentStatus() {
           <div className="no-agents">No agents online</div>
         ) : (
           agents.map(agent => (
-            <div key={agent.id} className={`agent-badge status-${agent.status}`}>
-              <span className="agent-status-dot"></span>
-              <span className="agent-name">{agent.name || agent.id}</span>
-              {agent.workload && (
-                <span className="agent-workload">{agent.workload}%</span>
+            <div key={agent.id} className={`agent-card status-${agent.status}`}>
+              <div className="agent-header">
+                <div className="agent-info">
+                  <span 
+                    className="agent-status-dot" 
+                    style={{ backgroundColor: getStatusColor(agent.status) }}
+                  ></span>
+                  <div className="agent-names">
+                    <span className="agent-name">{agent.name || agent.id}</span>
+                    <span className="agent-status-text">{agent.status}</span>
+                  </div>
+                </div>
+                {agent.workload !== undefined && (
+                  <span className="agent-workload">{agent.workload}%</span>
+                )}
+              </div>
+              
+              {agent.current_task && (
+                <div className="agent-task">
+                  <span className="task-icon">📋</span>
+                  <span className="task-text">{agent.current_task}</span>
+                </div>
+              )}
+              
+              {agent.last_update && (
+                <div className="agent-meta">
+                  <span className="update-time">Last: {formatLastUpdate(agent.last_update)}</span>
+                </div>
               )}
             </div>
           ))
