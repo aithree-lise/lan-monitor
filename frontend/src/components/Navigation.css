@@ -1,9 +1,10 @@
 /* Navigation Bar */
 .navigation {
-  background: linear-gradient(135deg, #0f1633 0%, #1a2347 100%);
-  border-bottom: 2px solid #2a3a6f;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border-bottom: 2px solid var(--border);
   padding: 1.5rem 0;
-  sticky: top;
+  position: sticky;
+  top: 0;
   z-index: 100;
 }
 
@@ -18,11 +19,27 @@
 }
 
 .nav-title {
-  color: #e0e0ff;
+  color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
   white-space: nowrap;
+}
+
+.theme-toggle {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+}
+
+.theme-toggle:hover {
+  background: var(--accent);
+  color: white;
 }
 
 .nav-tabs {
@@ -33,7 +50,7 @@
 .nav-tab {
   background: transparent;
   border: none;
-  color: #a0a0ff;
+  color: var(--text-secondary);
   font-size: 1rem;
   font-weight: 600;
   padding: 0.8rem 1.5rem;
@@ -44,13 +61,13 @@
 }
 
 .nav-tab:hover {
-  color: #b0b0ff;
+  color: var(--text-accent);
 }
 
 .nav-tab.active {
-  color: #e0e0ff;
-  border-bottom-color: #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+  box-shadow: 0 2px 8px var(--accent-glow);
 }
 
 @media (max-width: 768px) {

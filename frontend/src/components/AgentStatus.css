@@ -1,7 +1,7 @@
 /* Agent Status Component */
 .agent-status {
-  background: #0f1633;
-  border: 1px solid #1e2a5f;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -27,7 +27,7 @@
 }
 
 .agent-status-title {
-  color: #b0b0ff;
+  color: var(--text-accent);
   font-weight: 600;
   margin-bottom: 1rem;
   font-size: 0.95rem;
@@ -42,30 +42,30 @@
 }
 
 .agent-card {
-  background: #0a0e27;
-  border: 1px solid #1e2a5f;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 .agent-card:hover {
-  border-color: #2a3a6f;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 12px var(--shadow-accent);
   transform: translateY(-2px);
 }
 
 .agent-card.status-online {
-  border-left: 4px solid #90ee90;
+  border-left: 4px solid var(--up-border);
 }
 
 .agent-card.status-idle {
-  border-left: 4px solid #ffeb3b;
+  border-left: 4px solid var(--warn-border);
 }
 
 .agent-card.status-offline {
-  border-left: 4px solid #ff6b6b;
+  border-left: 4px solid var(--down-border);
 }
 
 /* Status-specific glow effects */
@@ -111,21 +111,21 @@
 }
 
 .agent-name {
-  color: #e0e0ff;
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 1rem;
 }
 
 .agent-status-text {
-  color: #7a7aff;
+  color: var(--text-muted);
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
 .agent-workload {
-  background: rgba(102, 126, 234, 0.2);
-  color: #667eea;
+  background: var(--accent-glow);
+  color: var(--accent);
   padding: 0.4rem 0.8rem;
   border-radius: 12px;
   font-weight: 600;
@@ -134,8 +134,8 @@
 }
 
 .agent-task {
-  background: #0f1633;
-  border: 1px solid #1e2a5f;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0.75rem;
   margin-top: 0.75rem;
@@ -149,7 +149,7 @@
 }
 
 .task-text {
-  color: #a0a0ff;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.4;
   flex: 1;
@@ -158,16 +158,16 @@
 .agent-meta {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #1e2a5f;
+  border-top: 1px solid var(--border);
 }
 
 .update-time {
-  color: #666a99;
+  color: var(--text-dim);
   font-size: 0.85rem;
 }
 
 .no-agents {
-  color: #666a99;
+  color: var(--text-dim);
   text-align: center;
   padding: 2rem 1rem;
   font-style: italic;
@@ -179,7 +179,7 @@
 }
 
 .agent-error-text {
-  color: #ff6b6b;
+  color: var(--error-border);
   font-size: 0.9rem;
 }
 

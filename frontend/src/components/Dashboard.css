@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  color: #9ca3af;
+  color: var(--text-secondary);
 }
 
 .spinner {
@@ -34,7 +34,7 @@
 
 .dashboard-header h1 {
   margin: 0;
-  color: #f9fafb;
+  color: var(--text-primary);
   font-size: 2rem;
 }
 
@@ -51,19 +51,19 @@
 }
 
 .status-badge.up {
-  background: rgba(74, 222, 128, 0.2);
-  color: #4ade80;
+  background: var(--up-bg);
+  color: var(--up-text);
 }
 
 .status-badge.down {
-  background: rgba(248, 113, 113, 0.2);
-  color: #f87171;
+  background: var(--down-bg);
+  color: var(--down-text);
 }
 
 .error-banner {
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid #f87171;
-  color: #fca5a5;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 2rem;
@@ -71,13 +71,14 @@
 
 .gpu-section,
 .kanban-section,
+.ideas-section,
 .services-section {
   margin-bottom: 3rem;
 }
 
 .section-title {
   font-size: 1.5rem;
-  color: #f9fafb;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   font-weight: 600;
 }
@@ -100,14 +101,28 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 2rem;
-  border-top: 1px solid #374151;
-  color: #9ca3af;
+  border-top: 1px solid var(--border);
+  color: var(--text-secondary);
   font-size: 0.875rem;
 }
 
+.refresh-countdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+
 .refresh-button {
-  background: #374151;
-  color: #f9fafb;
+  background: var(--refresh-bg);
+  color: var(--refresh-text);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -116,7 +131,7 @@
 }
 
 .refresh-button:hover {
-  background: #4b5563;
+  background: var(--refresh-hover);
 }
 
 @media (max-width: 768px) {

@@ -1,6 +1,6 @@
 import './Navigation.css';
 
-export default function Navigation({ currentTab, onTabChange }) {
+export default function Navigation({ currentTab, onTabChange, theme, toggleTheme }) {
   return (
     <nav className="navigation">
       <div className="nav-container">
@@ -20,6 +20,10 @@ export default function Navigation({ currentTab, onTabChange }) {
             💡 Ideas
           </button>
         </div>
+
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+        </button>
       </div>
     </nav>
   );
