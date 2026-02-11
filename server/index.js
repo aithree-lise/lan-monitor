@@ -4,6 +4,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js';
 import { getServiceHistory } from './history.js';
+import {
+  getAllTickets,
+  getTicketById,
+  createTicket,
+  updateTicket,
+  deleteTicket,
+  getAgentsStatus,
+  updateAgentStatus,
+  validateTicketData
+} from './tickets.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -100,6 +110,112 @@ app.get('/api/gpu', async (req, res) => {
     res.json({ ...result, cached: false });
   } catch (error) {
     res.status(500).json({ error: error.message, gpus: [], status: 'error' });
+  }
+});
+
+// ============================================
+// AP5: Kanban Tickets API
+// ============================================
+
+// GET all tickets (with optional filters)
+app.get('/api/tickets', (req, res) => {
+  try {
+    const filters = {};
+    if (req.query.lane) filters.lane = req.query.lane;
+    if (req.query.assignee) filters.assignee = req.query.assignee;
+    
+    const tickets = getAllTickets(filters);
+    res.json({ tickets, count: tickets.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET single ticket
+app.get('/api/tickets/:id', (req, res) => {
+  try {
+    const ticket = getTicketById(req.params.id);
+    
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+    
+    res.json(ticket);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST create new ticket
+app.post('/api/tickets', (req, res) => {
+  try {
+    // Validate
+    const errors = validateTicketData(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({ error: errors.join(', ') });
+    }
+    
+    const ticket = createTicket(req.body);
+    res.status(201).json(ticket);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT update ticket
+app.put('/api/tickets/:id', (req, res) => {
+  try {
+    const ticket = getTicketById(req.params.id);
+    
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+    
+    // Validate if provided
+    const errors = validateTicketData(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({ error: errors.join(', ') });
+    }
+    
+    const updated = updateTicket(req.params.id, req.body);
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE ticket
+app.delete('/api/tickets/:id', (req, res) => {
+  try {
+    const success = deleteTicket(req.params.id);
+    
+    if (!success) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+    
+    res.json({ success: true, id: req.params.id });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET agents status
+app.get('/api/agents/status', (req, res) => {
+  try {
+    const agents = getAgentsStatus();
+    res.json(agents);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT update agent status
+app.put('/api/agents/:name/status', (req, res) => {
+  try {
+    const agent = updateAgentStatus(req.params.name, req.body);
+    res.json(agent);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
