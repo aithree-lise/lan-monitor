@@ -101,7 +101,7 @@ export function updateTicket(id, data) {
     params.push(data.status);
   }
   
-  updates.push('updated_at = datetime("now")');
+  updates.push('updated_at = datetime(\'now\')');
   params.push(id);
   
   exec(
@@ -159,7 +159,7 @@ export function updateAgentStatus(name, data) {
       params.push(data.currentTask);
     }
     
-    updates.push('last_update = datetime("now")');
+    updates.push('last_update = datetime(\'now\')');
     params.push(name);
     
     exec(
