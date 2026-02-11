@@ -27,6 +27,7 @@ import {
   validateIdeaUpdate
 } from './ideas.js';
 import { startAgentReporter, manualAgentCheck } from './agent-reporter.js';
+import { createAlert, getRecentAlerts, getServiceAlerts } from './alerts.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,6 +70,13 @@ app.get('/api/services', async (req, res) => {
     const results = await checkAllServices();
     cachedResults = results;
     lastCheck = now;
+    
+    // Create alerts for down services
+    results.forEach(service => {
+      if (service.status === 'down') {
+        createAlert(service.id, service.name, 'down', `Service ${service.name} is down`);
+      }
+    });
     
     res.json({ services: results, cached: false });
   } catch (error) {
@@ -129,6 +137,51 @@ app.get('/api/gpu', async (req, res) => {
     res.json({ ...result, cached: false });
   } catch (error) {
     res.status(500).json({ error: error.message, gpus: [], status: 'error' });
+  }
+});
+
+// ============================================
+// TASK-015: System Info Panel
+// ============================================
+app.get('/api/system', async (req, res) => {
+  try {
+    const { execSync } = await import('child_process');
+    
+    const uptime = execSync('uptime -p').toString().trim();
+    const disk = execSync("df -h / | tail -1 | awk '{print $3\"/\"$2\" (\"$5\")}'").toString().trim();
+    const mem = execSync("free -h | grep Mem | awk '{print $3\"/\"$2}'").toString().trim();
+    const load = execSync("cat /proc/loadavg | awk '{print $1, $2, $3}'").toString().trim();
+    
+    res.json({ 
+      uptime, 
+      disk, 
+      memory: mem, 
+      loadAvg: load,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// TASK-013: Service Health Alerts
+// ============================================
+app.get('/api/alerts', (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+    const serviceId = req.query.service;
+    
+    let alerts;
+    if (serviceId) {
+      alerts = getServiceAlerts(serviceId, limit);
+    } else {
+      alerts = getRecentAlerts(limit);
+    }
+    
+    res.json({ alerts, count: alerts.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
