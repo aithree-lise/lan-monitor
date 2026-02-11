@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js';
 import { getServiceHistory } from './history.js';
@@ -143,20 +144,33 @@ app.get('/api/gpu', async (req, res) => {
 // ============================================
 // TASK-015: System Info Panel
 // ============================================
-app.get('/api/system', async (req, res) => {
+app.get('/api/system', (req, res) => {
   try {
-    const { execSync } = await import('child_process');
+    const { execSync } = require('child_process');
     
-    const uptime = execSync('uptime -p').toString().trim();
-    const disk = execSync("df -h / | tail -1 | awk '{print $3\"/\"$2\" (\"$5\")}'").toString().trim();
-    const mem = execSync("free -h | grep Mem | awk '{print $3\"/\"$2}'").toString().trim();
-    const load = execSync("cat /proc/loadavg | awk '{print $1, $2, $3}'").toString().trim();
+    const uptimeSeconds = os.uptime();
+    const uptimeStr = `${Math.floor(uptimeSeconds/3600)}h ${Math.floor((uptimeSeconds%3600)/60)}m`;
     
-    res.json({ 
-      uptime, 
-      disk, 
-      memory: mem, 
-      loadAvg: load,
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    const memStr = `${(usedMem/1e9).toFixed(1)}G/${(totalMem/1e9).toFixed(1)}G`;
+    
+    const loadAvg = os.loadavg();
+    const loadStr = loadAvg.map(l => l.toFixed(2)).join(', ');
+    
+    let disk = 'unknown';
+    try {
+      disk = execSync('df -h / --output=used,size,pcent | tail -1').toString().trim();
+    } catch(e) {
+      // Fallback if command fails
+    }
+    
+    res.json({
+      uptime: uptimeStr,
+      memory: memStr,
+      loadAvg: loadStr,
+      disk,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
