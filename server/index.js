@@ -14,6 +14,7 @@ import {
   updateAgentStatus,
   validateTicketData
 } from './tickets.js';
+import { startAgentReporter, manualAgentCheck } from './agent-reporter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -229,7 +230,20 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// GET manual agent check endpoint
+app.get('/api/agents/check', async (req, res) => {
+  try {
+    const results = await manualAgentCheck();
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🦀 LAN Monitor API running on http://0.0.0.0:${PORT}`);
   console.log(`📊 Dashboard: http://0.0.0.0:${PORT}`);
+  
+  // Start agent heartbeat reporter (60s interval)
+  startAgentReporter(60);
 });
