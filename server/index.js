@@ -6,8 +6,6 @@ import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js'
 import { getServiceHistory } from './history.js';
 import { getAllTickets, createTicket, updateTicket, deleteTicket, getAgentStatus, setAgentStatus } from './tickets.js';
 import { getAllIdeas, getIdeaById, createIdea, updateIdea, deleteIdea, convertIdeaToTicket, validateIdeaData, validateIdeaUpdate } from './ideas.js';
-import { initializeDatabase } from './db.js';
-import { runMigrations } from './migrate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -241,8 +239,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Initialize database and run migrations
 try {
-  initializeDatabase();
-  runMigrations();
   console.log('✅ Database initialized and migrations completed');
 } catch (error) {
   console.error('❌ Database initialization failed:', error);
