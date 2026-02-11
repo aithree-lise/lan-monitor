@@ -200,7 +200,7 @@ export function convertIdeaToTicket(ideaId) {
 }
 
 // Validation
-const VALID_IDEA_STATUSES = ['proposed', 'approved', 'rejected', 'converted'];
+const VALID_IDEA_STATUSES = ['proposed', 'approved', 'rejected', 'deferred', 'converted'];
 
 // For POST: title is required
 export function validateIdeaData(data) {

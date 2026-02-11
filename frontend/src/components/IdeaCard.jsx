@@ -114,7 +114,7 @@ export default function IdeaCard({ idea, onReview, onConvert }) {
 
       <div className="idea-meta">
         <span className="idea-date">📅 {createdDate}</span>
-        {idea.author && <span className="idea-author">👤 {idea.author}</span>}
+        {idea.submitted_by && <span className="idea-author">👤 {idea.submitted_by}</span>}
       </div>
 
       {idea.status === 'proposed' && (

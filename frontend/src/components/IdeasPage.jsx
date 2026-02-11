@@ -5,7 +5,6 @@ import './IdeasPage.css';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const STATUS_OPTIONS = ['proposed', 'approved', 'rejected', 'deferred'];
-const PRIORITY_OPTIONS = ['low', 'medium', 'high', 'critical'];
 
 export default function IdeasPage() {
   const [ideas, setIdeas] = useState([]);
@@ -13,7 +12,6 @@ export default function IdeasPage() {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     status: 'proposed',
-    priority: '',
     tags: ''
   });
 
@@ -26,8 +24,7 @@ export default function IdeasPage() {
   const fetchIdeas = async () => {
     try {
       let url = `${API_URL}/api/ideas?status=${filters.status}`;
-      if (filters.priority) url += `&priority=${filters.priority}`;
-      if (filters.tags) url += `&tags=${filters.tags}`;
+      if (filters.tags) url += `&tag=${filters.tags}`;
 
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch ideas');
@@ -86,22 +83,6 @@ export default function IdeasPage() {
         </div>
 
         <div className="filter-group">
-          <label htmlFor="priority-filter">Priority</label>
-          <select
-            id="priority-filter"
-            value={filters.priority}
-            onChange={(e) => handleFilterChange('priority', e.target.value)}
-          >
-            <option value="">All Priorities</option>
-            {PRIORITY_OPTIONS.map(priority => (
-              <option key={priority} value={priority}>
-                {priority.charAt(0).toUpperCase() + priority.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="filter-group">
           <label htmlFor="tags-filter">Tags</label>
           <input
             id="tags-filter"
@@ -114,7 +95,7 @@ export default function IdeasPage() {
 
         <button
           className="clear-filters-btn"
-          onClick={() => setFilters({ status: 'proposed', priority: '', tags: '' })}
+          onClick={() => setFilters({ status: 'proposed', tags: '' })}
         >
           Clear Filters
         </button>
