@@ -57,5 +57,29 @@ The server now uses SQLite for all data persistence.
 - In Docker: Mounted as volume for persistence
 - Can be inspected with: `sqlite3 data/lan-monitor.db`
 
+## Schema Changes (AP6.2)
+If you have an old database with the integer `ideas.id` column, you need to migrate:
+
+```sql
+-- Backup old data
+CREATE TABLE ideas_old AS SELECT * FROM ideas;
+
+-- Drop old table
+DROP TABLE ideas;
+
+-- Create new table (will be done by db.js on restart)
+-- Restart the server to auto-create new schema
+
+-- Restore data with new ID format (optional):
+-- INSERT INTO ideas (id, title, description, status, tags, submitted_by, created_at, updated_at)
+-- SELECT 'IDEA-' || PRINTF('%03d', id), title, description, status, tags, submitted_by, created_at, updated_at
+-- FROM ideas_old;
+```
+
+Or simply delete the database file and it will be recreated:
+```bash
+rm data/lan-monitor.db
+```
+
 ## Rollback (if needed)
 Keep old `tickets.json` and `agents.json` files. Migration is non-destructive.

@@ -1,10 +1,10 @@
-// Migration script: JSON → SQLite
+// Migration script: JSON → SQLite + Schema updates
 // Run once: node server/migrate.js
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { db, exec, queryOne } from './db.js';
+import { db, exec, query, queryOne } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OLD_TICKETS_FILE = path.join(__dirname, '..', 'data', 'tickets.json');

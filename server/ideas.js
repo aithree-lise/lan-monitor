@@ -3,14 +3,24 @@ import { createTicket } from './tickets.js';
 
 // Generate next idea ID (auto-increment with prefix)
 function getNextIdeaId() {
-  const result = queryOne("SELECT id FROM ideas WHERE id LIKE 'IDEA-%' ORDER BY CAST(SUBSTR(id, 6) AS INTEGER) DESC LIMIT 1");
+  // Check for IDEA-XXX format first
+  const ideaResult = queryOne("SELECT id FROM ideas WHERE id LIKE 'IDEA-%' ORDER BY CAST(SUBSTR(id, 6) AS INTEGER) DESC LIMIT 1");
   
-  if (!result) return 'IDEA-001';
+  if (ideaResult) {
+    const match = ideaResult.id.match(/IDEA-(\d+)/);
+    const nextNum = match ? parseInt(match[1]) + 1 : 1;
+    return `IDEA-${String(nextNum).padStart(3, '0')}`;
+  }
   
-  const match = result.id.match(/IDEA-(\d+)/);
-  const nextNum = match ? parseInt(match[1]) + 1 : 1;
+  // Fallback: check for highest numeric ID (old format)
+  const numResult = queryOne("SELECT id FROM ideas WHERE id REGEXP '^[0-9]+$' ORDER BY CAST(id AS INTEGER) DESC LIMIT 1");
   
-  return `IDEA-${String(nextNum).padStart(3, '0')}`;
+  if (numResult) {
+    const nextNum = parseInt(numResult.id) + 1;
+    return `IDEA-${String(nextNum).padStart(3, '0')}`;
+  }
+  
+  return 'IDEA-001';
 }
 
 // Helper: serialize tags (array → JSON string)
@@ -83,6 +93,9 @@ export function createIdea(data) {
   const id = getNextIdeaId();
   const now = new Date().toISOString();
   
+  // Handle both camelCase (submittedBy) and snake_case (submitted_by)
+  const submittedBy = data.submitted_by || data.submittedBy || 'anonymous';
+  
   const result = exec(
     `INSERT INTO ideas (id, title, description, tags, status, submitted_by, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -92,7 +105,7 @@ export function createIdea(data) {
       data.description || '',
       serializeTags(data.tags),
       data.status || 'proposed',
-      data.submitted_by || 'anonymous',
+      submittedBy,
       now,
       now
     ]
