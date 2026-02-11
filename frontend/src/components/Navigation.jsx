@@ -19,6 +19,12 @@ export default function Navigation({ currentTab, onTabChange, theme, toggleTheme
           >
             💡 Ideas
           </button>
+          <button
+            className={`nav-tab ${currentTab === 'chat' ? 'active' : ''}`}
+            onClick={() => onTabChange('chat')}
+          >
+            💬 Team Chat
+          </button>
         </div>
 
         <button className="theme-toggle" onClick={toggleTheme}>
