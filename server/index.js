@@ -22,7 +22,8 @@ import {
   updateIdea,
   deleteIdea,
   convertIdeaToTicket,
-  validateIdeaData
+  validateIdeaData,
+  validateIdeaUpdate
 } from './ideas.js';
 import { startAgentReporter, manualAgentCheck } from './agent-reporter.js';
 
@@ -311,8 +312,8 @@ app.put('/api/ideas/:id', (req, res) => {
       return res.status(404).json({ error: 'Idea not found' });
     }
     
-    // Validate if provided
-    const errors = validateIdeaData(req.body);
+    // Validate only fields being updated
+    const errors = validateIdeaUpdate(req.body);
     if (errors.length > 0) {
       return res.status(400).json({ error: errors.join(', ') });
     }

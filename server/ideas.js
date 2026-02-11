@@ -202,6 +202,7 @@ export function convertIdeaToTicket(ideaId) {
 // Validation
 const VALID_IDEA_STATUSES = ['proposed', 'approved', 'rejected', 'converted'];
 
+// For POST: title is required
 export function validateIdeaData(data) {
   const errors = [];
   
@@ -211,6 +212,27 @@ export function validateIdeaData(data) {
     errors.push('Title must be at least 3 characters');
   }
   
+  if (data.status && !VALID_IDEA_STATUSES.includes(data.status)) {
+    errors.push(`Status must be one of: ${VALID_IDEA_STATUSES.join(', ')}`);
+  }
+  
+  return errors;
+}
+
+// For PUT: only validate fields that are actually being sent
+export function validateIdeaUpdate(data) {
+  const errors = [];
+  
+  // Only validate title if it's being updated
+  if (data.title !== undefined) {
+    if (typeof data.title !== 'string') {
+      errors.push('Title must be a string');
+    } else if (data.title.trim().length < 3) {
+      errors.push('Title must be at least 3 characters');
+    }
+  }
+  
+  // Only validate status if it's being updated
   if (data.status && !VALID_IDEA_STATUSES.includes(data.status)) {
     errors.push(`Status must be one of: ${VALID_IDEA_STATUSES.join(', ')}`);
   }
