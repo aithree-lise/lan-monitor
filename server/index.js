@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url';
 import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js';
 import { getServiceHistory } from './history.js';
 import { getAllTickets, createTicket, updateTicket, deleteTicket, getAgentStatus, setAgentStatus } from './tickets.js';
+import { getAllIdeas, getIdeaById, createIdea, updateIdea, deleteIdea, convertIdeaToTicket, validateIdeaData, validateIdeaUpdate } from './ideas.js';
+import { initializeDatabase } from './db.js';
+import { runMigrations } from './migrate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -161,6 +164,71 @@ app.put('/api/agents/:name/status', (req, res) => {
   }
 });
 
+// --- Ideas Management API (AP6) ---
+app.get('/api/ideas', (req, res) => {
+  try {
+    const ideas = getAllIdeas(req.query);
+    res.json({ ideas });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/ideas/:id', (req, res) => {
+  try {
+    const idea = getIdeaById(req.params.id);
+    if (!idea) return res.status(404).json({ error: 'Idea not found' });
+    res.json({ idea });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/ideas', (req, res) => {
+  try {
+    const errors = validateIdeaData(req.body);
+    if (errors.length > 0) return res.status(400).json({ errors });
+    
+    const idea = createIdea(req.body);
+    res.status(201).json({ idea });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/ideas/:id', (req, res) => {
+  try {
+    const errors = validateIdeaUpdate(req.body);
+    if (errors.length > 0) return res.status(400).json({ errors });
+    
+    const idea = updateIdea(req.params.id, req.body);
+    if (!idea) return res.status(404).json({ error: 'Idea not found' });
+    res.json({ idea });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/ideas/:id', (req, res) => {
+  try {
+    const ok = deleteIdea(req.params.id);
+    if (!ok) return res.status(404).json({ error: 'Idea not found' });
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/ideas/:id/convert', (req, res) => {
+  try {
+    const result = convertIdeaToTicket(req.params.id, req.body);
+    if (!result) return res.status(404).json({ error: 'Idea not found or not approved' });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Serve static frontend (production)
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, '..', 'dist');
@@ -169,6 +237,16 @@ if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
+}
+
+// Initialize database and run migrations
+try {
+  initializeDatabase();
+  runMigrations();
+  console.log('✅ Database initialized and migrations completed');
+} catch (error) {
+  console.error('❌ Database initialization failed:', error);
+  process.exit(1);
 }
 
 app.listen(PORT, '0.0.0.0', () => {
