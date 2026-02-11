@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js';
 import { getServiceHistory } from './history.js';
+import { getAllTickets, createTicket, updateTicket, deleteTicket, getAgentStatus, setAgentStatus } from './tickets.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -100,6 +101,63 @@ app.get('/api/gpu', async (req, res) => {
     res.json({ ...result, cached: false });
   } catch (error) {
     res.status(500).json({ error: error.message, gpus: [], status: 'error' });
+  }
+});
+
+// --- Ticket API ---
+app.get('/api/tickets', (req, res) => {
+  try {
+    const { lane, assignee } = req.query;
+    res.json(getAllTickets(lane, assignee));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/tickets', (req, res) => {
+  try {
+    const ticket = createTicket(req.body);
+    res.status(201).json({ ticket });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/tickets/:id', (req, res) => {
+  try {
+    const ticket = updateTicket(req.params.id, req.body);
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+    res.json({ ticket });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/tickets/:id', (req, res) => {
+  try {
+    const ok = deleteTicket(req.params.id);
+    if (!ok) return res.status(404).json({ error: 'Ticket not found' });
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// --- Agent Status API ---
+app.get('/api/agents/status', (req, res) => {
+  try {
+    res.json(getAgentStatus());
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/agents/:name/status', (req, res) => {
+  try {
+    const agent = setAgentStatus(req.params.name, req.body);
+    res.json(agent);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
