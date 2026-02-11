@@ -12,6 +12,13 @@ const COLUMNS = {
   done: { title: 'Done', emoji: '✅' }
 };
 
+const AGENT_OPTIONS = [
+  { value: 'siegbert', label: 'Siegbert 🎩' },
+  { value: 'eugene', label: 'Eugene' },
+  { value: 'bubblebass', label: 'Bubble Bass 🥒' },
+  { value: 'sandy', label: 'Sandy Cheeks 🔍' }
+];
+
 export default function KanbanBoard() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,6 +97,11 @@ export default function KanbanBoard() {
 
   // Handle ticket move
   const handleMove = (updatedTicket) => {
+    setTickets(tickets.map(t => t.id === updatedTicket.id ? updatedTicket : t));
+  };
+
+  // Handle ticket update
+  const handleUpdate = (updatedTicket) => {
     setTickets(tickets.map(t => t.id === updatedTicket.id ? updatedTicket : t));
   };
 
@@ -179,13 +191,18 @@ export default function KanbanBoard() {
 
               <div className="form-group">
                 <label htmlFor="assigned_to">Assigned To</label>
-                <input
+                <select
                   id="assigned_to"
-                  type="text"
-                  placeholder="Agent name (optional)"
                   value={formData.assigned_to}
                   onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                />
+                >
+                  <option value="">Unassigned</option>
+                  {AGENT_OPTIONS.map(agent => (
+                    <option key={agent.value} value={agent.value}>
+                      {agent.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -230,6 +247,7 @@ export default function KanbanBoard() {
                     ticket={ticket}
                     onMove={handleMove}
                     onDelete={handleDelete}
+                    onUpdate={handleUpdate}
                   />
                 ))
               )}

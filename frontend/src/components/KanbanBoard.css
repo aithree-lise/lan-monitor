@@ -43,99 +43,6 @@
   transform: translateY(0);
 }
 
-/* Agent Status Bar */
-.agent-status {
-  background: #0f1633;
-  border: 1px solid #1e2a5f;
-  border-radius: 8px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.agent-status.loading,
-.agent-status.error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  min-height: 60px;
-}
-
-.agent-spinner {
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.agent-status-title {
-  color: #b0b0ff;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  font-size: 0.95rem;
-}
-
-.agent-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.agent-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: #1a2347;
-  border: 1px solid #2a3a6f;
-  border-radius: 20px;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.9rem;
-  color: #a0a0ff;
-  transition: all 0.3s ease;
-}
-
-.agent-status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #90ee90;
-  display: inline-block;
-}
-
-.agent-badge.status-idle .agent-status-dot {
-  background: #ffeb3b;
-}
-
-.agent-badge.status-offline .agent-status-dot {
-  background: #ff6b6b;
-}
-
-.agent-name {
-  font-weight: 500;
-}
-
-.agent-workload {
-  font-size: 0.85rem;
-  color: #7a7aff;
-  margin-left: 0.4rem;
-}
-
-.no-agents {
-  color: #666a99;
-  font-style: italic;
-}
-
-.agent-error-icon {
-  font-size: 1.3rem;
-}
-
-.agent-error-text {
-  color: #ff6b6b;
-  font-size: 0.9rem;
-}
-
 /* New Ticket Form */
 .new-ticket-form-container {
   background: #0f1633;
@@ -242,17 +149,17 @@
   border-color: #3a4a8f;
 }
 
-/* Kanban Board */
+/* Kanban Board - Desktop: 4 columns, Mobile: 1 column stack */
 .kanban-board {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   min-height: 400px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .kanban-board {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -357,22 +264,6 @@
   transform: translateY(-2px);
 }
 
-.ticket-card.priority-low {
-  border-left-color: #90ee90;
-}
-
-.ticket-card.priority-medium {
-  border-left-color: #ffeb3b;
-}
-
-.ticket-card.priority-high {
-  border-left-color: #ff9800;
-}
-
-.ticket-card.priority-critical {
-  border-left-color: #ff6b6b;
-}
-
 .ticket-header {
   display: flex;
   justify-content: space-between;
@@ -398,26 +289,6 @@
   padding: 0.3rem 0.6rem;
   border-radius: 4px;
   text-transform: uppercase;
-}
-
-.priority-badge.low {
-  background: rgba(144, 238, 144, 0.2);
-  color: #90ee90;
-}
-
-.priority-badge.medium {
-  background: rgba(255, 235, 59, 0.2);
-  color: #ffeb3b;
-}
-
-.priority-badge.high {
-  background: rgba(255, 152, 0, 0.2);
-  color: #ff9800;
-}
-
-.priority-badge.critical {
-  background: rgba(255, 107, 107, 0.2);
-  color: #ff6b6b;
 }
 
 .delete-btn {
@@ -449,13 +320,39 @@
   line-height: 1.4;
 }
 
-.ticket-assignee {
-  background: #0f1633;
+.ticket-assignee-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.8rem 0;
+}
+
+.assignee-label {
   color: #7a7aff;
-  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.assignee-select {
+  background: #0f1633;
+  border: 1px solid #1e2a5f;
   border-radius: 4px;
+  padding: 0.5rem;
+  color: #a0a0ff;
   font-size: 0.9rem;
-  margin: 0.6rem 0;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.assignee-select:hover,
+.assignee-select:focus {
+  outline: none;
+  border-color: #2a3a6f;
+}
+
+.assignee-select option {
+  background: #0a0e27;
+  color: #a0a0ff;
 }
 
 .ticket-meta {
@@ -544,4 +441,28 @@
 .kanban-board.loading p {
   color: #a0a0ff;
   font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .kanban-container {
+    padding: 1rem;
+  }
+
+  .kanban-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .kanban-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .new-ticket-btn {
+    align-self: flex-start;
+  }
+
+  .column-tickets {
+    max-height: none;
+  }
 }
