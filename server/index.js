@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js';
+import { getServiceHistory } from './history.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -55,6 +56,28 @@ app.get('/api/services/:id', async (req, res) => {
     
     const result = await checkService(service);
     res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/services/:id/history', (req, res) => {
+  try {
+    const service = SERVICES.find(s => s.id === req.params.id);
+    if (!service) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    
+    const hours = Math.max(1, Math.min(168, parseInt(req.query.hours) || 24)); // 1-168 hours (7 days)
+    const history = getServiceHistory(req.params.id, hours);
+    
+    res.json({
+      serviceId: req.params.id,
+      serviceName: service.name,
+      hours,
+      entries: history.length,
+      history
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

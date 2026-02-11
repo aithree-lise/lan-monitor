@@ -11,9 +11,15 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - NVIDIA_VISIBLE_DEVICES=all
+      - DATA_DIR=/app/data
+    volumes:
+      - lan-monitor-data:/app/data
     restart: unless-stopped
     networks:
       - lise-network
+
+volumes:
+  lan-monitor-data:
 
 networks:
   lise-network:
