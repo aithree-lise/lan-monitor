@@ -1,3 +1,4 @@
+import { registerRedisRoutes } from './redis-api.js';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -411,6 +412,8 @@ app.post('/api/ideas/:id/convert', (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+registerRedisRoutes(app);
 
 // 404 for unmapped API routes
 app.use('/api/', (req, res) => {
