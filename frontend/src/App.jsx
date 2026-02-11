@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import IdeasPage from './components/IdeasPage';
+import RedisChat from './components/RedisChat';
 import './App.css';
 
 function App() {
@@ -24,7 +25,9 @@ function App() {
         toggleTheme={toggleTheme} 
       />
       <main className="app-content">
-        {currentTab === 'dashboard' ? <Dashboard /> : <IdeasPage />}
+        {currentTab === 'dashboard' ? <Dashboard /> : 
+         currentTab === 'ideas' ? <IdeasPage /> : 
+         <RedisChat />}
       </main>
     </div>
   );

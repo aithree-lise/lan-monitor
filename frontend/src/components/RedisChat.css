@@ -1,0 +1,33 @@
+.redis-chat {
+  padding: 2rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.chat-messages {
+  margin-top: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.chat-message {
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
+.message-ts {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.message-from {
+  font-weight: bold;
+  margin: 0 0.5rem;
+}
+
+.message-text {
+  color: var(--text-primary);
+}
