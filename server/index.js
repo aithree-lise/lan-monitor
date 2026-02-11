@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js';
 import { getServiceHistory } from './history.js';
+import { db } from './db.js';
 import {
   getAllTickets,
   getTicketById,

@@ -1,198 +1,186 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { db, query, queryOne, exec } from './db.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Storage path
-const DATA_DIR = process.env.DATA_DIR || '/app/data';
-const TICKETS_FILE = path.join(DATA_DIR, 'tickets.json');
-const AGENTS_FILE = path.join(DATA_DIR, 'agents.json');
-
-// Ensure data directory exists
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+// Get next ticket ID (auto-increment)
+function getNextTicketId() {
+  const result = queryOne('SELECT id FROM tickets ORDER BY SUBSTR(id, 6) DESC LIMIT 1');
+  
+  if (!result) return 'TASK-001';
+  
+  const match = result.id.match(/TASK-(\d+)/);
+  const nextNum = match ? parseInt(match[1]) + 1 : 1;
+  
+  return `TASK-${String(nextNum).padStart(3, '0')}`;
 }
 
-// Load tickets from JSON
-function loadTickets() {
-  ensureDataDir();
-  
-  if (!fs.existsSync(TICKETS_FILE)) {
-    return [];
-  }
-  
-  try {
-    const data = fs.readFileSync(TICKETS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error loading tickets:', error);
-    return [];
-  }
-}
-
-// Save tickets to JSON
-function saveTickets(tickets) {
-  ensureDataDir();
-  
-  try {
-    fs.writeFileSync(TICKETS_FILE, JSON.stringify(tickets, null, 2));
-  } catch (error) {
-    console.error('Error saving tickets:', error);
-  }
-}
-
-// Load agents status
-function loadAgents() {
-  ensureDataDir();
-  
-  if (!fs.existsSync(AGENTS_FILE)) {
-    return {
-      eugene: { name: 'Eugene', status: 'idle', currentTask: null, lastUpdate: null },
-      bubblebass: { name: 'Bubble Bass', status: 'idle', currentTask: null, lastUpdate: null },
-      byte: { name: 'Byte', status: 'idle', currentTask: null, lastUpdate: null },
-      siegbert: { name: 'Siegbert', status: 'idle', currentTask: null, lastUpdate: null }
-    };
-  }
-  
-  try {
-    const data = fs.readFileSync(AGENTS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error loading agents:', error);
-    return {};
-  }
-}
-
-// Save agents status
-function saveAgents(agents) {
-  ensureDataDir();
-  
-  try {
-    fs.writeFileSync(AGENTS_FILE, JSON.stringify(agents, null, 2));
-  } catch (error) {
-    console.error('Error saving agents:', error);
-  }
-}
-
-// Generate next ticket ID
-function getNextTicketId(tickets) {
-  if (tickets.length === 0) return 'TASK-001';
-  
-  const maxId = Math.max(...tickets.map(t => {
-    const match = t.id.match(/TASK-(\d+)/);
-    return match ? parseInt(match[1]) : 0;
-  }));
-  
-  return `TASK-${String(maxId + 1).padStart(3, '0')}`;
-}
-
-// CRUD Operations
+// CRUD Operations for Tickets
 export function getAllTickets(filters = {}) {
-  let tickets = loadTickets();
+  let sql = 'SELECT * FROM tickets WHERE 1=1';
+  const params = [];
   
   if (filters.lane) {
-    tickets = tickets.filter(t => t.lane === filters.lane);
+    sql += ' AND lane = ?';
+    params.push(filters.lane);
   }
   
   if (filters.assignee) {
-    tickets = tickets.filter(t => t.assignee === filters.assignee);
+    sql += ' AND assignee = ?';
+    params.push(filters.assignee);
   }
   
-  return tickets;
+  if (filters.status) {
+    sql += ' AND status = ?';
+    params.push(filters.status);
+  }
+  
+  sql += ' ORDER BY created_at DESC';
+  
+  return query(sql, params);
 }
 
 export function getTicketById(id) {
-  const tickets = loadTickets();
-  return tickets.find(t => t.id === id);
+  return queryOne('SELECT * FROM tickets WHERE id = ?', [id]);
 }
 
 export function createTicket(data) {
-  const tickets = loadTickets();
+  const id = getNextTicketId();
+  const now = new Date().toISOString();
   
-  const newTicket = {
-    id: getNextTicketId(tickets),
-    title: data.title,
-    description: data.description || '',
-    assignee: data.assignee || 'unassigned',
-    lane: data.lane || 'backlog',
-    priority: data.priority || 'medium',
-    branch: data.branch || null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
+  exec(
+    `INSERT INTO tickets (id, title, description, assignee, lane, priority, branch, status, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      id,
+      data.title,
+      data.description || '',
+      data.assignee || 'unassigned',
+      data.lane || 'backlog',
+      data.priority || 'medium',
+      data.branch || null,
+      data.status || 'open',
+      now,
+      now
+    ]
+  );
   
-  tickets.push(newTicket);
-  saveTickets(tickets);
-  
-  return newTicket;
+  return getTicketById(id);
 }
 
 export function updateTicket(id, data) {
-  const tickets = loadTickets();
-  const index = tickets.findIndex(t => t.id === id);
+  const ticket = getTicketById(id);
+  if (!ticket) return null;
   
-  if (index === -1) return null;
+  const updates = [];
+  const params = [];
   
-  const ticket = tickets[index];
+  if (data.title !== undefined) {
+    updates.push('title = ?');
+    params.push(data.title);
+  }
+  if (data.description !== undefined) {
+    updates.push('description = ?');
+    params.push(data.description);
+  }
+  if (data.assignee !== undefined) {
+    updates.push('assignee = ?');
+    params.push(data.assignee);
+  }
+  if (data.lane !== undefined) {
+    updates.push('lane = ?');
+    params.push(data.lane);
+  }
+  if (data.priority !== undefined) {
+    updates.push('priority = ?');
+    params.push(data.priority);
+  }
+  if (data.branch !== undefined) {
+    updates.push('branch = ?');
+    params.push(data.branch);
+  }
+  if (data.status !== undefined) {
+    updates.push('status = ?');
+    params.push(data.status);
+  }
   
-  if (data.title !== undefined) ticket.title = data.title;
-  if (data.description !== undefined) ticket.description = data.description;
-  if (data.assignee !== undefined) ticket.assignee = data.assignee;
-  if (data.lane !== undefined) ticket.lane = data.lane;
-  if (data.priority !== undefined) ticket.priority = data.priority;
-  if (data.branch !== undefined) ticket.branch = data.branch;
+  updates.push('updated_at = datetime("now")');
+  params.push(id);
   
-  ticket.updatedAt = new Date().toISOString();
+  exec(
+    `UPDATE tickets SET ${updates.join(', ')} WHERE id = ?`,
+    params
+  );
   
-  tickets[index] = ticket;
-  saveTickets(tickets);
-  
-  return ticket;
+  return getTicketById(id);
 }
 
 export function deleteTicket(id) {
-  const tickets = loadTickets();
-  const index = tickets.findIndex(t => t.id === id);
-  
-  if (index === -1) return false;
-  
-  tickets.splice(index, 1);
-  saveTickets(tickets);
-  
-  return true;
+  const result = exec('DELETE FROM tickets WHERE id = ?', [id]);
+  return result.changes > 0;
 }
 
 // Agent Status Operations
 export function getAgentsStatus() {
-  return loadAgents();
+  const agents = query('SELECT * FROM agents');
+  
+  // Convert array to object keyed by name
+  const result = {};
+  agents.forEach(agent => {
+    result[agent.name] = {
+      name: agent.name,
+      status: agent.status,
+      currentTask: agent.current_task,
+      lastUpdate: agent.last_update
+    };
+  });
+  
+  return result;
 }
 
 export function updateAgentStatus(name, data) {
-  const agents = loadAgents();
+  // Check if agent exists
+  const existing = queryOne('SELECT * FROM agents WHERE name = ?', [name]);
   
-  if (!agents[name]) {
-    agents[name] = { name: name, status: 'idle', currentTask: null, lastUpdate: null };
+  if (!existing) {
+    // Insert new agent
+    exec(
+      'INSERT INTO agents (name, status, current_task) VALUES (?, ?, ?)',
+      [name, data.status || 'idle', data.currentTask || null]
+    );
+  } else {
+    // Update existing
+    const updates = [];
+    const params = [];
+    
+    if (data.status !== undefined) {
+      updates.push('status = ?');
+      params.push(data.status);
+    }
+    if (data.currentTask !== undefined) {
+      updates.push('current_task = ?');
+      params.push(data.currentTask);
+    }
+    
+    updates.push('last_update = datetime("now")');
+    params.push(name);
+    
+    exec(
+      `UPDATE agents SET ${updates.join(', ')} WHERE name = ?`,
+      params
+    );
   }
   
-  const agent = agents[name];
-  
-  if (data.status !== undefined) agent.status = data.status;
-  if (data.currentTask !== undefined) agent.currentTask = data.currentTask;
-  agent.lastUpdate = new Date().toISOString();
-  
-  agents[name] = agent;
-  saveAgents(agents);
-  
-  return agent;
+  const agent = queryOne('SELECT * FROM agents WHERE name = ?', [name]);
+  return {
+    name: agent.name,
+    status: agent.status,
+    currentTask: agent.current_task,
+    lastUpdate: agent.last_update
+  };
 }
 
 // Validation
 const VALID_LANES = ['backlog', 'inprogress', 'review', 'done'];
-const VALID_PRIORITIES = ['low', 'medium', 'high'];
+const VALID_STATUSES = ['open', 'in-progress', 'done', 'blocked'];
+const VALID_PRIORITIES = ['low', 'medium', 'high', 'critical'];
 const VALID_AGENTS = ['eugene', 'bubblebass', 'byte', 'siegbert', 'unassigned'];
 
 export function validateTicketData(data) {
@@ -204,6 +192,10 @@ export function validateTicketData(data) {
   
   if (data.lane && !VALID_LANES.includes(data.lane)) {
     errors.push(`Lane must be one of: ${VALID_LANES.join(', ')}`);
+  }
+  
+  if (data.status && !VALID_STATUSES.includes(data.status)) {
+    errors.push(`Status must be one of: ${VALID_STATUSES.join(', ')}`);
   }
   
   if (data.priority && !VALID_PRIORITIES.includes(data.priority)) {
