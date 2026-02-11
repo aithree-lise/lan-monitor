@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import IdeaCard from './IdeaCard';
 import './IdeasPage.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const STATUS_OPTIONS = ['proposed', 'approved', 'rejected', 'deferred'];
 
