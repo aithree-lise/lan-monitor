@@ -273,7 +273,7 @@ app.get('/api/ideas', (req, res) => {
 // GET single idea
 app.get('/api/ideas/:id', (req, res) => {
   try {
-    const idea = getIdeaById(parseInt(req.params.id));
+    const idea = getIdeaById(req.params.id);
     
     if (!idea) {
       res.status(404);
@@ -305,7 +305,7 @@ app.post('/api/ideas', (req, res) => {
 // PUT update idea
 app.put('/api/ideas/:id', (req, res) => {
   try {
-    const idea = getIdeaById(parseInt(req.params.id));
+    const idea = getIdeaById(req.params.id);
     
     if (!idea) {
       return res.status(404).json({ error: 'Idea not found' });
@@ -317,7 +317,7 @@ app.put('/api/ideas/:id', (req, res) => {
       return res.status(400).json({ error: errors.join(', ') });
     }
     
-    const updated = updateIdea(parseInt(req.params.id), req.body);
+    const updated = updateIdea(req.params.id, req.body);
     res.json(updated);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -327,7 +327,7 @@ app.put('/api/ideas/:id', (req, res) => {
 // DELETE idea
 app.delete('/api/ideas/:id', (req, res) => {
   try {
-    const success = deleteIdea(parseInt(req.params.id));
+    const success = deleteIdea(req.params.id);
     
     if (!success) {
       return res.status(404).json({ error: 'Idea not found' });
@@ -342,7 +342,7 @@ app.delete('/api/ideas/:id', (req, res) => {
 // POST convert idea to ticket
 app.post('/api/ideas/:id/convert', (req, res) => {
   try {
-    const result = convertIdeaToTicket(parseInt(req.params.id));
+    const result = convertIdeaToTicket(req.params.id);
     
     if (result.error) {
       const status = result.status || 500;
