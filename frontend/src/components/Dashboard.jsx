@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ServiceCard from './ServiceCard';
 import GpuCard from './GpuCard';
+import KanbanBoard from './KanbanBoard';
 import './Dashboard.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -102,6 +103,10 @@ export default function Dashboard() {
           </div>
         </section>
       )}
+
+      <section className="kanban-section">
+        <KanbanBoard />
+      </section>
 
       <section className="services-section">
         <h2 className="section-title">🔧 Services</h2>

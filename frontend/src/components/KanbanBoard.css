@@ -1,0 +1,547 @@
+/* Dark Theme Kanban Board */
+.kanban-container {
+  padding: 2rem;
+  background: #0a0e27;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.kanban-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #1e2a5f;
+}
+
+.kanban-header h2 {
+  color: #e0e0ff;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.new-ticket-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.new-ticket-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.new-ticket-btn:active {
+  transform: translateY(0);
+}
+
+/* Agent Status Bar */
+.agent-status {
+  background: #0f1633;
+  border: 1px solid #1e2a5f;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.agent-status.loading,
+.agent-status.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 60px;
+}
+
+.agent-spinner {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.agent-status-title {
+  color: #b0b0ff;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.agent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.agent-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #1a2347;
+  border: 1px solid #2a3a6f;
+  border-radius: 20px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  color: #a0a0ff;
+  transition: all 0.3s ease;
+}
+
+.agent-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #90ee90;
+  display: inline-block;
+}
+
+.agent-badge.status-idle .agent-status-dot {
+  background: #ffeb3b;
+}
+
+.agent-badge.status-offline .agent-status-dot {
+  background: #ff6b6b;
+}
+
+.agent-name {
+  font-weight: 500;
+}
+
+.agent-workload {
+  font-size: 0.85rem;
+  color: #7a7aff;
+  margin-left: 0.4rem;
+}
+
+.no-agents {
+  color: #666a99;
+  font-style: italic;
+}
+
+.agent-error-icon {
+  font-size: 1.3rem;
+}
+
+.agent-error-text {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+}
+
+/* New Ticket Form */
+.new-ticket-form-container {
+  background: #0f1633;
+  border: 1px solid #2a3a6f;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.new-ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #b0b0ff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  background: #0a0e27;
+  border: 1px solid #1e2a5f;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #e0e0ff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.submit-btn,
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.cancel-btn {
+  background: #1a2347;
+  color: #a0a0ff;
+  border: 1px solid #2a3a6f;
+}
+
+.cancel-btn:hover {
+  background: #242d52;
+  border-color: #3a4a8f;
+}
+
+/* Kanban Board */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  min-height: 400px;
+}
+
+@media (max-width: 1200px) {
+  .kanban-board {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kanban-column {
+  background: #0f1633;
+  border: 1px solid #1e2a5f;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.kanban-column:hover {
+  border-color: #2a3a6f;
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.15);
+}
+
+.column-header {
+  background: linear-gradient(135deg, #1a2347 0%, #1e2d52 100%);
+  padding: 1.2rem;
+  border-bottom: 2px solid #2a3a6f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column-header h3 {
+  color: #b0b0ff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ticket-count {
+  background: #667eea;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.column-tickets {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+.column-tickets::-webkit-scrollbar {
+  width: 6px;
+}
+
+.column-tickets::-webkit-scrollbar-track {
+  background: #0a0e27;
+  border-radius: 3px;
+}
+
+.column-tickets::-webkit-scrollbar-thumb {
+  background: #2a3a6f;
+  border-radius: 3px;
+}
+
+.column-tickets::-webkit-scrollbar-thumb:hover {
+  background: #3a4a8f;
+}
+
+.empty-column {
+  color: #666a99;
+  text-align: center;
+  padding: 2rem 1rem;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* Ticket Card */
+.ticket-card {
+  background: #0a0e27;
+  border: 1px solid #1e2a5f;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  cursor: grab;
+  border-left: 4px solid #667eea;
+}
+
+.ticket-card:hover {
+  border-color: #2a3a6f;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.ticket-card.priority-low {
+  border-left-color: #90ee90;
+}
+
+.ticket-card.priority-medium {
+  border-left-color: #ffeb3b;
+}
+
+.ticket-card.priority-high {
+  border-left-color: #ff9800;
+}
+
+.ticket-card.priority-critical {
+  border-left-color: #ff6b6b;
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.8rem;
+}
+
+.ticket-id-priority {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.ticket-id {
+  color: #7a7aff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.priority-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.priority-badge.low {
+  background: rgba(144, 238, 144, 0.2);
+  color: #90ee90;
+}
+
+.priority-badge.medium {
+  background: rgba(255, 235, 59, 0.2);
+  color: #ffeb3b;
+}
+
+.priority-badge.high {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+}
+
+.priority-badge.critical {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.delete-btn:hover {
+  color: #ff6b6b;
+}
+
+.ticket-title {
+  color: #e0e0ff;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.6rem 0;
+  line-height: 1.4;
+}
+
+.ticket-description {
+  color: #a0a0ff;
+  font-size: 0.9rem;
+  margin: 0.6rem 0;
+  line-height: 1.4;
+}
+
+.ticket-assignee {
+  background: #0f1633;
+  color: #7a7aff;
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin: 0.6rem 0;
+}
+
+.ticket-meta {
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.85rem;
+  color: #666a99;
+  margin: 0.8rem 0;
+}
+
+.ticket-date {
+  display: inline-block;
+}
+
+.ticket-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.move-btn {
+  flex: 1;
+  background: #1a2347;
+  color: #a0a0ff;
+  border: 1px solid #2a3a6f;
+  padding: 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.move-btn:hover:not(:disabled) {
+  background: #242d52;
+  border-color: #3a4a8f;
+  color: #b0b0ff;
+}
+
+.move-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.prev-btn:hover:not(:disabled) {
+  background: rgba(100, 180, 255, 0.2);
+  border-color: #64b4ff;
+}
+
+.next-btn:hover:not(:disabled) {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+}
+
+/* Error Banner */
+.error-banner {
+  background: rgba(255, 107, 107, 0.15);
+  border: 1px solid #ff6b6b;
+  color: #ff9999;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+/* Loading State */
+.kanban-board.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.kanban-spinner {
+  font-size: 3rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.kanban-board.loading p {
+  color: #a0a0ff;
+  font-size: 1.1rem;
+}
