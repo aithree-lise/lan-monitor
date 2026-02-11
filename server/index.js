@@ -30,7 +30,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors());
@@ -373,7 +373,7 @@ if (process.env.NODE_ENV === 'production') {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🦀 LAN Monitor API running on http://0.0.0.0:${PORT}`);
-  console.log(`📊 Dashboard: http://0.0.0.0:${PORT}`);
+  console.log(`📊 Dashboard: http://localhost:${PORT}`);
   
   // Start agent heartbeat reporter (60s interval)
   startAgentReporter(60);

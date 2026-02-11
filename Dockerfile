@@ -33,7 +33,7 @@ RUN cd server && npm install --production
 COPY server ./server
 
 # Expose port
-EXPOSE 3000
+EXPOSE 8080
 
 # Set production mode
 ENV NODE_ENV=production
