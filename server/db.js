@@ -57,6 +57,15 @@ function initDb() {
       current_task TEXT,
       last_update TEXT DEFAULT (datetime('now'))
     );
+    
+    CREATE TABLE IF NOT EXISTS alerts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      service_id TEXT NOT NULL,
+      service_name TEXT,
+      status TEXT,
+      message TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
   
   console.log(`📊 Database initialized at ${DB_PATH}`);
