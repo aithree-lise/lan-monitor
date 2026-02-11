@@ -181,13 +181,44 @@ export function updateAgentStatus(name, data) {
 const VALID_LANES = ['backlog', 'inprogress', 'review', 'done'];
 const VALID_STATUSES = ['open', 'in-progress', 'done', 'blocked'];
 const VALID_PRIORITIES = ['low', 'medium', 'high', 'critical'];
-const VALID_AGENTS = ['eugene', 'bubblebass', 'byte', 'siegbert', 'unassigned'];
+const VALID_AGENTS = ['eugene', 'bubblebass', 'sandy', 'siegbert', 'unassigned'];
 
+// For POST: title is required
 export function validateTicketData(data) {
   const errors = [];
   
   if (!data.title || typeof data.title !== 'string' || data.title.trim().length === 0) {
     errors.push('Title is required and must be non-empty');
+  }
+  
+  if (data.lane && !VALID_LANES.includes(data.lane)) {
+    errors.push(`Lane must be one of: ${VALID_LANES.join(', ')}`);
+  }
+  
+  if (data.status && !VALID_STATUSES.includes(data.status)) {
+    errors.push(`Status must be one of: ${VALID_STATUSES.join(', ')}`);
+  }
+  
+  if (data.priority && !VALID_PRIORITIES.includes(data.priority)) {
+    errors.push(`Priority must be one of: ${VALID_PRIORITIES.join(', ')}`);
+  }
+  
+  if (data.assignee && !VALID_AGENTS.includes(data.assignee)) {
+    errors.push(`Assignee must be one of: ${VALID_AGENTS.join(', ')}`);
+  }
+  
+  return errors;
+}
+
+// For PUT: only validate fields being updated
+export function validateTicketUpdate(data) {
+  const errors = [];
+  
+  // Only validate title if it's being updated
+  if (data.title !== undefined) {
+    if (typeof data.title !== 'string' || data.title.trim().length === 0) {
+      errors.push('Title must be non-empty');
+    }
   }
   
   if (data.lane && !VALID_LANES.includes(data.lane)) {

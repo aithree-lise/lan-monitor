@@ -13,7 +13,8 @@ import {
   deleteTicket,
   getAgentsStatus,
   updateAgentStatus,
-  validateTicketData
+  validateTicketData,
+  validateTicketUpdate
 } from './tickets.js';
 import {
   getAllIdeas,
@@ -193,8 +194,8 @@ app.put('/api/tickets/:id', (req, res) => {
       return res.status(404).json({ error: 'Ticket not found' });
     }
     
-    // Validate if provided
-    const errors = validateTicketData(req.body);
+    // Validate only fields being updated
+    const errors = validateTicketUpdate(req.body);
     if (errors.length > 0) {
       return res.status(400).json({ error: errors.join(', ') });
     }
