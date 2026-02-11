@@ -1,6 +1,49 @@
 import { query, queryOne, exec } from './db.js';
 import { createTicket } from './tickets.js';
 
+// Generate next idea ID (auto-increment with prefix)
+function getNextIdeaId() {
+  const result = queryOne("SELECT id FROM ideas WHERE id LIKE 'IDEA-%' ORDER BY CAST(SUBSTR(id, 6) AS INTEGER) DESC LIMIT 1");
+  
+  if (!result) return 'IDEA-001';
+  
+  const match = result.id.match(/IDEA-(\d+)/);
+  const nextNum = match ? parseInt(match[1]) + 1 : 1;
+  
+  return `IDEA-${String(nextNum).padStart(3, '0')}`;
+}
+
+// Helper: serialize tags (array → JSON string)
+function serializeTags(tags) {
+  if (Array.isArray(tags)) {
+    return JSON.stringify(tags);
+  }
+  if (typeof tags === 'string' && tags.length > 0) {
+    return JSON.stringify(tags.split(',').map(t => t.trim()));
+  }
+  return JSON.stringify([]);
+}
+
+// Helper: deserialize tags (JSON string → array)
+function deserializeTags(tagsJson) {
+  if (!tagsJson) return [];
+  try {
+    const parsed = JSON.parse(tagsJson);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+// Format idea response (deserialize tags)
+function formatIdea(rawIdea) {
+  if (!rawIdea) return null;
+  return {
+    ...rawIdea,
+    tags: deserializeTags(rawIdea.tags)
+  };
+}
+
 // Get all ideas with filters & sorting
 export function getAllIdeas(filters = {}) {
   let sql = 'SELECT * FROM ideas WHERE 1=1';
@@ -25,25 +68,29 @@ export function getAllIdeas(filters = {}) {
   
   sql += ` ORDER BY ${sortColumn} ${order}`;
   
-  return query(sql, params);
+  const ideas = query(sql, params);
+  return ideas.map(formatIdea);
 }
 
 // Get single idea
 export function getIdeaById(id) {
-  return queryOne('SELECT * FROM ideas WHERE id = ?', [id]);
+  const idea = queryOne('SELECT * FROM ideas WHERE id = ?', [id]);
+  return formatIdea(idea);
 }
 
 // Create new idea
 export function createIdea(data) {
+  const id = getNextIdeaId();
   const now = new Date().toISOString();
   
   const result = exec(
-    `INSERT INTO ideas (title, description, tags, status, submitted_by, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO ideas (id, title, description, tags, status, submitted_by, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [
+      id,
       data.title,
       data.description || '',
-      data.tags || '',
+      serializeTags(data.tags),
       data.status || 'proposed',
       data.submitted_by || 'anonymous',
       now,
@@ -51,7 +98,7 @@ export function createIdea(data) {
     ]
   );
   
-  return getIdeaById(result.lastInsertRowid);
+  return getIdeaById(id);
 }
 
 // Update idea
@@ -72,7 +119,7 @@ export function updateIdea(id, data) {
   }
   if (data.tags !== undefined) {
     updates.push('tags = ?');
-    params.push(data.tags);
+    params.push(serializeTags(data.tags));
   }
   if (data.status !== undefined) {
     updates.push('status = ?');
@@ -83,7 +130,7 @@ export function updateIdea(id, data) {
     params.push(data.submitted_by);
   }
   
-  updates.push('updated_at = datetime("now")');
+  updates.push('updated_at = datetime(\'now\')');
   params.push(id);
   
   exec(
@@ -128,7 +175,7 @@ export function convertIdeaToTicket(ideaId) {
     
     // Update idea: set status to converted + store ticket ID
     exec(
-      'UPDATE ideas SET status = ?, converted_ticket_id = ?, updated_at = datetime("now") WHERE id = ?',
+      'UPDATE ideas SET status = ?, converted_ticket_id = ?, updated_at = datetime(\'now\') WHERE id = ?',
       ['converted', ticket.id, ideaId]
     );
     
