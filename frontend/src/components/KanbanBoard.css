@@ -1,7 +1,7 @@
-/* Dark Theme Kanban Board */
+/* Kanban Board */
 .kanban-container {
   padding: 2rem;
-  background: #0a0e27;
+  background: var(--bg-primary);
   border-radius: 12px;
   margin-bottom: 2rem;
 }
@@ -12,18 +12,18 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #1e2a5f;
+  border-bottom: 2px solid var(--border);
 }
 
 .kanban-header h2 {
-  color: #e0e0ff;
+  color: var(--text-primary);
   font-size: 1.8rem;
   font-weight: 600;
   margin: 0;
 }
 
 .new-ticket-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -31,12 +31,12 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px var(--accent-glow-strong);
 }
 
 .new-ticket-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 6px 20px var(--accent-glow-strong);
 }
 
 .new-ticket-btn:active {
@@ -45,8 +45,8 @@
 
 /* New Ticket Form */
 .new-ticket-form-container {
-  background: #0f1633;
-  border: 1px solid #2a3a6f;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-hover);
   border-radius: 10px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -66,7 +66,7 @@
 }
 
 .form-group label {
-  color: #b0b0ff;
+  color: var(--text-accent);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -74,11 +74,11 @@
 .form-group input,
 .form-group textarea,
 .form-group select {
-  background: #0a0e27;
-  border: 1px solid #1e2a5f;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: 6px;
   padding: 0.75rem;
-  color: #e0e0ff;
+  color: var(--input-text);
   font-family: inherit;
   font-size: 0.95rem;
   transition: border-color 0.3s ease;
@@ -88,8 +88,8 @@
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .form-group textarea {
@@ -128,28 +128,28 @@
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px var(--accent-glow-strong);
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 6px 20px var(--accent-glow-strong);
 }
 
 .cancel-btn {
-  background: #1a2347;
-  color: #a0a0ff;
-  border: 1px solid #2a3a6f;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-hover);
 }
 
 .cancel-btn:hover {
-  background: #242d52;
-  border-color: #3a4a8f;
+  background: var(--bg-tertiary-hover);
+  border-color: var(--border-hover);
 }
 
-/* Kanban Board - Desktop: 4 columns, Mobile: 1 column stack */
+/* Kanban Board Grid */
 .kanban-board {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -170,39 +170,39 @@
 }
 
 .kanban-column {
-  background: #0f1633;
-  border: 1px solid #1e2a5f;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px var(--shadow);
   transition: all 0.3s ease;
 }
 
 .kanban-column:hover {
-  border-color: #2a3a6f;
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.15);
+  border-color: var(--border-hover);
+  box-shadow: 0 6px 16px var(--shadow-accent);
 }
 
 .column-header {
-  background: linear-gradient(135deg, #1a2347 0%, #1e2d52 100%);
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-tertiary-hover) 100%);
   padding: 1.2rem;
-  border-bottom: 2px solid #2a3a6f;
+  border-bottom: 2px solid var(--border-hover);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .column-header h3 {
-  color: #b0b0ff;
+  color: var(--text-accent);
   font-size: 1.1rem;
   font-weight: 600;
   margin: 0;
 }
 
 .ticket-count {
-  background: #667eea;
+  background: var(--accent);
   color: white;
   padding: 0.3rem 0.8rem;
   border-radius: 12px;
@@ -225,21 +225,21 @@
 }
 
 .column-tickets::-webkit-scrollbar-track {
-  background: #0a0e27;
+  background: var(--scrollbar-track);
   border-radius: 3px;
 }
 
 .column-tickets::-webkit-scrollbar-thumb {
-  background: #2a3a6f;
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
 .column-tickets::-webkit-scrollbar-thumb:hover {
-  background: #3a4a8f;
+  background: var(--scrollbar-thumb-hover);
 }
 
 .empty-column {
-  color: #666a99;
+  color: var(--text-dim);
   text-align: center;
   padding: 2rem 1rem;
   font-style: italic;
@@ -248,19 +248,19 @@
 
 /* Ticket Card */
 .ticket-card {
-  background: #0a0e27;
-  border: 1px solid #1e2a5f;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1.2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px var(--shadow);
   transition: all 0.3s ease;
   cursor: grab;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--accent);
 }
 
 .ticket-card:hover {
-  border-color: #2a3a6f;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 12px var(--shadow-accent);
   transform: translateY(-2px);
 }
 
@@ -278,7 +278,7 @@
 }
 
 .ticket-id {
-  color: #7a7aff;
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -294,7 +294,7 @@
 .delete-btn {
   background: none;
   border: none;
-  color: #999;
+  color: var(--text-dim);
   font-size: 1.3rem;
   cursor: pointer;
   padding: 0;
@@ -302,11 +302,11 @@
 }
 
 .delete-btn:hover {
-  color: #ff6b6b;
+  color: var(--down-text);
 }
 
 .ticket-title {
-  color: #e0e0ff;
+  color: var(--text-primary);
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 0.6rem 0;
@@ -314,7 +314,7 @@
 }
 
 .ticket-description {
-  color: #a0a0ff;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   margin: 0.6rem 0;
   line-height: 1.4;
@@ -328,17 +328,17 @@
 }
 
 .assignee-label {
-  color: #7a7aff;
+  color: var(--text-muted);
   font-size: 0.85rem;
   font-weight: 500;
 }
 
 .assignee-select {
-  background: #0f1633;
-  border: 1px solid #1e2a5f;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0.5rem;
-  color: #a0a0ff;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   cursor: pointer;
   transition: border-color 0.3s ease;
@@ -347,19 +347,19 @@
 .assignee-select:hover,
 .assignee-select:focus {
   outline: none;
-  border-color: #2a3a6f;
+  border-color: var(--border-hover);
 }
 
 .assignee-select option {
-  background: #0a0e27;
-  color: #a0a0ff;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
 }
 
 .ticket-meta {
   display: flex;
   gap: 0.8rem;
   font-size: 0.85rem;
-  color: #666a99;
+  color: var(--text-dim);
   margin: 0.8rem 0;
 }
 
@@ -375,9 +375,9 @@
 
 .move-btn {
   flex: 1;
-  background: #1a2347;
-  color: #a0a0ff;
-  border: 1px solid #2a3a6f;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-hover);
   padding: 0.6rem;
   border-radius: 6px;
   cursor: pointer;
@@ -387,9 +387,9 @@
 }
 
 .move-btn:hover:not(:disabled) {
-  background: #242d52;
-  border-color: #3a4a8f;
-  color: #b0b0ff;
+  background: var(--bg-tertiary-hover);
+  border-color: var(--border-hover);
+  color: var(--text-accent);
 }
 
 .move-btn:disabled {
@@ -403,15 +403,15 @@
 }
 
 .next-btn:hover:not(:disabled) {
-  background: rgba(102, 126, 234, 0.2);
-  border-color: #667eea;
+  background: var(--accent-glow);
+  border-color: var(--accent);
 }
 
 /* Error Banner */
 .error-banner {
-  background: rgba(255, 107, 107, 0.15);
-  border: 1px solid #ff6b6b;
-  color: #ff9999;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
@@ -439,7 +439,7 @@
 }
 
 .kanban-board.loading p {
-  color: #a0a0ff;
+  color: var(--text-secondary);
   font-size: 1.1rem;
 }
 
