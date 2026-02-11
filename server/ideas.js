@@ -13,9 +13,10 @@ function getNextIdeaId() {
   }
   
   // Fallback: check for highest numeric ID (old format)
-  const numResult = queryOne("SELECT id FROM ideas WHERE id REGEXP '^[0-9]+$' ORDER BY CAST(id AS INTEGER) DESC LIMIT 1");
+  // Use LENGTH check instead of REGEXP (SQLite doesn't have REGEXP without extension)
+  const numResult = queryOne("SELECT id FROM ideas WHERE LENGTH(id) <= 3 AND id NOT LIKE 'IDEA-%' ORDER BY CAST(id AS INTEGER) DESC LIMIT 1");
   
-  if (numResult) {
+  if (numResult && !isNaN(parseInt(numResult.id))) {
     const nextNum = parseInt(numResult.id) + 1;
     return `IDEA-${String(nextNum).padStart(3, '0')}`;
   }
