@@ -16,7 +16,7 @@ const AGENT_OPTIONS = [
   { value: 'siegbert', label: 'Siegbert 🎩' },
   { value: 'eugene', label: 'Eugene' },
   { value: 'bubblebass', label: 'Bubble Bass 🥒' },
-  { value: 'byte', label: 'Sandy Cheeks 🔍' }
+  { value: 'sandy', label: 'Sandy Cheeks 🔍' }
 ];
 
 export default function KanbanBoard() {

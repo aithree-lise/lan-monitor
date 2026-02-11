@@ -1,13 +1,4 @@
-import { useState } from 'react';
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-const COLUMNS = {
-  backlog: 'Backlog',
-  'in-progress': 'In Progress',
-  review: 'Review',
-  done: 'Done'
-};
 
 const COLUMN_ORDER = ['backlog', 'in-progress', 'review', 'done'];
 
@@ -15,7 +6,7 @@ const AGENT_OPTIONS = [
   { value: 'siegbert', label: 'Siegbert 🎩' },
   { value: 'eugene', label: 'Eugene' },
   { value: 'bubblebass', label: 'Bubble Bass 🥒' },
-  { value: 'byte', label: 'Sandy Cheeks 🔍' }
+  { value: 'sandy', label: 'Sandy Cheeks 🔍' }
 ];
 
 const PRIORITY_CONFIG = {
@@ -26,8 +17,6 @@ const PRIORITY_CONFIG = {
 };
 
 export default function TicketCard({ ticket, onMove, onDelete, onUpdate }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedAssignee, setEditedAssignee] = useState(ticket.assigned_to || '');
 
   const currentIndex = COLUMN_ORDER.indexOf(ticket.status);
   
@@ -57,7 +46,6 @@ export default function TicketCard({ ticket, onMove, onDelete, onUpdate }) {
 
   const handleAssigneeChange = async (e) => {
     const newAssignee = e.target.value;
-    setEditedAssignee(newAssignee);
 
     try {
       const res = await fetch(`${API_URL}/api/tickets/${ticket.id}`, {
@@ -129,7 +117,7 @@ export default function TicketCard({ ticket, onMove, onDelete, onUpdate }) {
         <select
           id={`assignee-${ticket.id}`}
           className="assignee-select"
-          value={editedAssignee}
+          value={ticket.assigned_to || ''}
           onChange={handleAssigneeChange}
         >
           <option value="">Unassigned</option>

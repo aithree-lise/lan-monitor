@@ -68,6 +68,19 @@
   border-left: 4px solid #ff6b6b;
 }
 
+/* Status-specific glow effects */
+.agent-card.status-online .agent-status-dot {
+  box-shadow: 0 0 8px rgba(144, 238, 144, 0.6);
+}
+
+.agent-card.status-idle .agent-status-dot {
+  box-shadow: 0 0 8px rgba(255, 235, 59, 0.6);
+}
+
+.agent-card.status-offline .agent-status-dot {
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.6);
+}
+
 .agent-header {
   display: flex;
   justify-content: space-between;
@@ -89,7 +102,6 @@
   display: inline-block;
   margin-top: 4px;
   flex-shrink: 0;
-  box-shadow: 0 0 8px rgba(144, 238, 144, 0.4);
 }
 
 .agent-names {
