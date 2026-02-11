@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [refreshCountdown, setRefreshCountdown] = useState(30);
 
   const fetchData = async () => {
     try {
@@ -49,6 +50,7 @@ export default function Dashboard() {
       setHistories(historyMap);
       
       setLastUpdate(new Date());
+      setRefreshCountdown(30); // Reset countdown
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -64,6 +66,20 @@ export default function Dashboard() {
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // Countdown timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRefreshCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [lastUpdate]); // Restart timer on each refresh
 
   const upCount = services.filter(s => s.status === 'up').length;
   const downCount = services.filter(s => s.status === 'down').length;
@@ -119,6 +135,10 @@ export default function Dashboard() {
 
       <footer className="dashboard-footer">
         <span>Last update: {lastUpdate?.toLocaleTimeString()}</span>
+        <div className="refresh-countdown">
+          Next refresh in {refreshCountdown}s
+          <div className="progress-bar" style={{ width: `${(refreshCountdown / 30) * 100}%` }}></div>
+        </div>
         <button onClick={fetchData} className="refresh-button">
           🔄 Refresh
         </button>
