@@ -26,6 +26,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Force JSON response type for all /api/ routes
+app.use('/api/', (req, res, next) => {
+  res.setHeader('Content-Type', 'application/json');
+  next();
+});
+
 // Cache for service checks (max 30s old)
 let cachedResults = null;
 let lastCheck = 0;
@@ -135,15 +141,19 @@ app.get('/api/tickets', (req, res) => {
 // GET single ticket
 app.get('/api/tickets/:id', (req, res) => {
   try {
+    res.setHeader('Content-Type', 'application/json');
     const ticket = getTicketById(req.params.id);
     
     if (!ticket) {
-      return res.status(404).json({ error: 'Ticket not found' });
+      res.status(404);
+      return res.json({ error: 'Ticket not found', id: req.params.id });
     }
     
+    res.status(200);
     res.json(ticket);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500);
+    res.json({ error: error.message });
   }
 });
 
@@ -220,16 +230,6 @@ app.put('/api/agents/:name/status', (req, res) => {
   }
 });
 
-// Serve static frontend (production)
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '..', 'dist');
-  app.use(express.static(frontendPath));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-}
-
 // GET manual agent check endpoint
 app.get('/api/agents/check', async (req, res) => {
   try {
@@ -239,6 +239,22 @@ app.get('/api/agents/check', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// 404 for unmapped API routes
+app.use('/api/', (req, res) => {
+  res.status(404).json({ error: 'API endpoint not found', path: req.path, method: req.method });
+});
+
+// Serve static frontend (production) — MUST BE AFTER ALL API ROUTES
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '..', 'dist');
+  app.use(express.static(frontendPath));
+  
+  app.get('*', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+}
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🦀 LAN Monitor API running on http://0.0.0.0:${PORT}`);
