@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import os from 'os';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { checkAllServices, checkService, checkGPU, SERVICES } from './checks.js';
 import { getServiceHistory } from './history.js';
@@ -422,6 +423,77 @@ app.get("/api/version", (req, res) => {
     nodeVersion: process.version
   });
 });
+
+// GET /api/health - System health checks
+app.get('/api/health', (req, res) => {
+  const checks = {};
+  let overallStatus = 'healthy';
+  
+  // Check 1: Database
+  try {
+    db.prepare('SELECT 1').get();
+    checks.db = { status: 'ok', message: 'Database responsive' };
+  } catch (error) {
+    checks.db = { status: 'error', message: error.message };
+    overallStatus = 'degraded';
+  }
+  
+  // Check 2: Disk Space
+  try {
+    const dfOutput = execSync('df -h /app', { encoding: 'utf8' });
+    const lines = dfOutput.trim().split('\n');
+    const diskLine = lines[1].split(/\s+/);
+    checks.disk = {
+      status: 'ok',
+      total: diskLine[1],
+      used: diskLine[2],
+      available: diskLine[3],
+      usedPercent: diskLine[4]
+    };
+    
+    const usedPct = parseInt(diskLine[4]);
+    if (usedPct > 90) {
+      checks.disk.status = 'warning';
+      checks.disk.message = 'Disk usage high';
+      overallStatus = 'degraded';
+    }
+  } catch (error) {
+    checks.disk = { status: 'error', message: error.message };
+    overallStatus = 'degraded';
+  }
+  
+  // Check 3: Memory
+  try {
+    const freeMem = os.freemem();
+    const totalMem = os.totalmem();
+    const usedMem = totalMem - freeMem;
+    const usedPct = (usedMem / totalMem * 100).toFixed(1);
+    
+    checks.memory = {
+      status: 'ok',
+      free: (freeMem / 1024 / 1024 / 1024).toFixed(2) + ' GB',
+      total: (totalMem / 1024 / 1024 / 1024).toFixed(2) + ' GB',
+      used: (usedMem / 1024 / 1024 / 1024).toFixed(2) + ' GB',
+      usedPercent: usedPct + '%'
+    };
+    
+    if (parseFloat(usedPct) > 85) {
+      checks.memory.status = 'warning';
+      checks.memory.message = 'Memory usage high';
+      overallStatus = 'degraded';
+    }
+  } catch (error) {
+    checks.memory = { status: 'error', message: error.message };
+    overallStatus = 'degraded';
+  }
+  
+  res.json({
+    status: overallStatus,
+    checks,
+    uptime: process.uptime()
+  });
+});
+
 registerRedisRoutes(app);
 
 // 404 for unmapped API routes
