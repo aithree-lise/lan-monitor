@@ -14,13 +14,13 @@ RUN cd frontend && npm run build
 # Production stage — nvidia/cuda base so nvidia-smi is available at runtime
 FROM nvidia/cuda:12.8.0-base-ubuntu22.04
 
+# Build arguments for version metadata
+ARG VERSION=1.0.0-dev
+ARG COMMIT=unknown
+ARG BUILD_TIME=unknown
+
 # Install Node.js 22 + build tools for better-sqlite3
-RUN apt-get update && apt-get install -y \
-    curl iputils-ping python3 make g++ && \
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-mark hold nodejs && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y     curl iputils-ping python3 make g++ &&     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - &&     apt-get install -y nodejs &&     apt-mark hold nodejs &&     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -37,8 +37,11 @@ COPY server ./server
 # Expose port
 EXPOSE 8080
 
-# Set production mode
+# Set production mode and version metadata as environment variables
 ENV NODE_ENV=production
+ENV VERSION=
+ENV COMMIT=
+ENV BUILD_TIME=
 
 # Start server
 CMD ["node", "server/index.js"]
