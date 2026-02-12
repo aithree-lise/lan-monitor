@@ -413,6 +413,15 @@ app.post('/api/ideas/:id/convert', (req, res) => {
   }
 });
 
+n// GET /api/version - Build metadata and version info
+app.get("/api/version", (req, res) => {
+  res.json({
+    version: process.env.VERSION || "1.0.0-dev",
+    commit: process.env.COMMIT || "unknown",
+    buildTime: process.env.BUILD_TIME || new Date().toISOString(),
+    nodeVersion: process.version
+  });
+});
 registerRedisRoutes(app);
 
 // 404 for unmapped API routes
