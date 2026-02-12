@@ -413,7 +413,7 @@ app.post('/api/ideas/:id/convert', (req, res) => {
   }
 });
 
-n// GET /api/version - Build metadata and version info
+// GET /api/version - Build metadata and version info
 app.get("/api/version", (req, res) => {
   res.json({
     version: process.env.VERSION || "1.0.0-dev",
