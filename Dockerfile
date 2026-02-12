@@ -39,9 +39,9 @@ EXPOSE 8080
 
 # Set production mode and version metadata as environment variables
 ENV NODE_ENV=production
-ENV VERSION=
-ENV COMMIT=
-ENV BUILD_TIME=
+ENV VERSION=${VERSION}
+ENV COMMIT=${COMMIT}
+ENV BUILD_TIME=${BUILD_TIME}
 
 # Start server
 CMD ["node", "server/index.js"]
