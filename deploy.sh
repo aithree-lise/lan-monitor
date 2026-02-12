@@ -65,8 +65,8 @@ docker run -d \
   --name ${CONTAINER_NAME} \
   --restart unless-stopped \
   -p ${PORT}:${PORT} \
-  --gpus all \
-  -v $(pwd)/data:/app/data \
+  --runtime=nvidia \
+  -v lan-monitor-data:/app/data \
   ${IMAGE_NAME}:${VERSION}
 
 if [ $? -ne 0 ]; then
@@ -107,5 +107,5 @@ docker logs --tail 20 ${CONTAINER_NAME}
 echo ""
 echo -e "${YELLOW}💡 Rollback instructions:${NC}"
 echo "   1. docker stop ${CONTAINER_NAME} && docker rm ${CONTAINER_NAME}"
-echo "   2. docker run -d --name ${CONTAINER_NAME} --restart unless-stopped -p ${PORT}:${PORT} --gpus all -v $(pwd)/data:/app/data ${IMAGE_NAME}:<previous-version>"
+echo "   2. docker run -d --name ${CONTAINER_NAME} --restart unless-stopped -p ${PORT}:${PORT} --runtime=nvidia -v lan-monitor-data:/app/data ${IMAGE_NAME}:<previous-version>"
 exit 1
